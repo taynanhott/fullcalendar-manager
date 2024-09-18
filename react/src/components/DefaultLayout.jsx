@@ -21,7 +21,7 @@ export default function DefaultLayout() {
   }
 
   useEffect(() => {
-    axiosClient.get('/user')
+    axiosClient.get('/users')
       .then(({data}) => {
          setUser(data)
       })
