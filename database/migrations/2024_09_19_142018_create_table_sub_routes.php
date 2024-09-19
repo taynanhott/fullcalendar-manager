@@ -11,7 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('sub_routes', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('route');
+            $table->foreignId('route_id')->constrained('routes')->onDelete('cascade');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('table_sub_routes');
     }
 };
