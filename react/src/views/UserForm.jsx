@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axiosClient from "../axios-client.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider.jsx";
+import { Button } from "@/components/ui/button.jsx";
+import { Input } from "@/components/ui/input.jsx";
 
 export default function UserForm() {
 
@@ -63,20 +65,24 @@ export default function UserForm() {
   }
 
   return (
-    <>
-      <div style={{ display: 'flex', justifyContent: "space-between", alignItems: "center" }}>
-        {user.id && <h1>Update User: {user.name}</h1>}
-        {!user.id && <h1>New User</h1>}
-        <Link className="btn-add" to="/users">Back</Link>
+    <div className="max-w-2xl min-h-[332px] mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl">
+      <div className="flex justify-between items-center">
+        {!loading ?
+          <>
+            {user.id && <h1 className="mb-2 font-bold text-lg">Update User: {user.name}</h1>}
+            {!user.id && <h1 className="mb-2 font-bold text-lg">New User</h1>}
+          </> : <></>
+        }
+
       </div>
-      <div className="card animated fadeInDown">
+      <div>
         {loading && (
-          <div className="text-center">
+          <div className="text-center my-auto font-bold">
             Loading...
           </div>
         )}
         {errors &&
-          <div className="alert">
+          <div className="bg-red-500 rounded-[6px] mb-4 p-4 text-white font-bold">
             {Object.keys(errors).map(key => (
               <p key={key}>{errors[key][0]}</p>
             ))}
@@ -84,14 +90,17 @@ export default function UserForm() {
         }
         {!loading && (
           <form onSubmit={onSubmit}>
-            <input value={user.name} onChange={ev => setUser({ ...user, name: ev.target.value })} placeholder="Name" />
-            <input value={user.email} onChange={ev => setUser({ ...user, email: ev.target.value })} placeholder="Email" />
-            <input type="password" onChange={ev => setUser({ ...user, password: ev.target.value })} placeholder="Password" />
-            <input type="password" onChange={ev => setUser({ ...user, password_confirmation: ev.target.value })} placeholder="Password Confirmation" />
-            <button className="btn">Save</button>
+            <Input className="mb-4" value={user.name} onChange={ev => setUser({ ...user, name: ev.target.value })} placeholder="Name" />
+            <Input className="mb-4" value={user.email} onChange={ev => setUser({ ...user, email: ev.target.value })} placeholder="Email" />
+            <Input className="mb-4" type="password" onChange={ev => setUser({ ...user, password: ev.target.value })} placeholder="Password" />
+            <Input className="mb-4" type="password" onChange={ev => setUser({ ...user, password_confirmation: ev.target.value })} placeholder="Password Confirmation" />
+            <div className="flex justify-end">
+              <Button type="button" className="bg-rose-500 hover:bg-rose-400 mr-2"><Link to="/users">Cancel</Link></Button>
+              <Button>Save</Button>
+            </div>
           </form>
         )}
       </div>
-    </>
+    </div>
   )
 }

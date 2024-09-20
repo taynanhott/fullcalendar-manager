@@ -7,16 +7,14 @@ export default function DefaultLayout() {
   const { notification } = useStateContext(); // Use context to get notification
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <div id="defaultLayout">
-        <div className="content">
-          <main>
-            <Outlet />
-          </main>
-          {notification && <div className="notification">{notification}</div>}
-        </div>
+      <div className="flex-grow bg-gray-200 px-8 py-4">
+        <main className="flex-grow">
+          <Outlet />
+        </main>
+        {notification && <div className="notification">{notification}</div>}
       </div>
-      </>
+    </div>
   );
 }

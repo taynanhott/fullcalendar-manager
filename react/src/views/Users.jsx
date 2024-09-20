@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axiosClient from "../axios-client.js";
 import { Link } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider.jsx";
+import { Button } from "@/components/ui/button.jsx";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -36,50 +37,53 @@ export default function Users() {
   }
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Users</h1>
-        <Link className="btn-add" to="/users/new">Add new</Link>
+    <div className="max-w-2xl min-h-[332px] mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="mb-2 font-bold text-lg">Users</h1>
+        <Button type="button">
+          <Link to="/users/new">Add new</Link>
+        </Button>
       </div>
-      <div className="card animated fadeInDown">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Create Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          {loading &&
-            <tbody>
+      {loading ?
+        <div className="text-center my-auto font-bold">
+          Loading...
+        </div> :
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan="5" className="text-center">
-                  Loading...
-                </td>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Create Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
-            </tbody>
-          }
-          {!loading &&
-            <tbody>
-              {users.map(u => (
-                <tr key={u.id}>
-                  <td>{u.id}</td>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>{u.created_at}</td>
-                  <td>
-                    <Link className="btn-edit" to={'/users/' + u.id}>Edit</Link>
-                    &nbsp;
-                    <button className="btn-delete" onClick={ev => onDeleteClick(u)}>Delete</button>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading && (
+                <tr>
+                  <td colSpan="5" className="text-center py-4">
+                    Loading...
                   </td>
                 </tr>
-              ))}
+              )}
+              {!loading &&
+                users.map((u) => (
+                  <tr key={u.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">{u.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{u.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{u.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{u.created_at}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Link className="text-indigo-600 hover:text-indigo-900" to={'/users/' + u.id}>Edit</Link>
+                      <button className="ml-4 text-red-600 hover:text-red-900" onClick={() => onDeleteClick(u)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
-          }
-        </table>
-      </div>
+          </table>
+        </div>
+      }
     </div>
   )
 }
