@@ -33,11 +33,9 @@ export function MenuSide() {
         Promise.all([
             axiosClient.get("/routes"),
             axiosClient.get("/subroutes"),
-            axiosClient.get("/users"),
-        ]).then(([routesRes, subRoutesRes, usersRes]) => {
+        ]).then(([routesRes, subRoutesRes]) => {
             setRoutes(routesRes.data);
             setSubRoutes(subRoutesRes.data);
-            setUser(usersRes.data);
         });
     }, []);
 
@@ -82,11 +80,9 @@ export function MenuTop() {
         Promise.all([
             axiosClient.get("/routes"),
             axiosClient.get("/subroutes"),
-            axiosClient.get("/users"),
-        ]).then(([routesRes, subRoutesRes, usersRes]) => {
+        ]).then(([routesRes, subRoutesRes]) => {
             setRoutes(routesRes.data);
             setSubRoutes(subRoutesRes.data);
-            setUser(usersRes.data);
         });
     }, []);
 
