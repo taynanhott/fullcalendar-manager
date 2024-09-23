@@ -9,7 +9,7 @@ export default function DefaultLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="flex-grow bg-gray-200 px-8 py-4">
+      <div className="flex-grow bg-gray-100 px-8 py-4">
         <main className="flex-grow">
           <Outlet />
         </main>

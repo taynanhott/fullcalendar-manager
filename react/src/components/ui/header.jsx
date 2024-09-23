@@ -24,11 +24,11 @@ export default function Header() {
     };
 
     return (
-        <header className="flex justify-between w-full items-center px-8 py-2 bg-sigesis">
+        <header className="flex justify-between w-full items-center px-8 py-2 bg-task shadow-lg shadow-task z-50">
             {width < 480 ? <MenuSide /> : <MenuTop />}
             <div>
                 {user.name} &nbsp; &nbsp;
-                <Button className="hover:bg-green-900 text-white font-bold" onClick={onLogout} aria-label="Logout">Logout</Button>
+                <Button className="hover:bg-dark-task text-dark-task font-bold" onClick={onLogout} aria-label="Logout">Logout</Button>
             </div>
         </header>
     );

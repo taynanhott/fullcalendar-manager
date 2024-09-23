@@ -29,7 +29,7 @@ const MenubarTrigger = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex cursor-pointer select-none items-center text-white rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-emerald-200 data-[state=open]:bg-accent data-[state=open]:text-emerald-200",
+      "flex cursor-pointer select-none items-center text-dark-task rounded-[6px] px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-task data-[state=open]:bg-dark-task data-[state=open]:text-task",
       className
     )}
     {...props} />
@@ -40,7 +40,7 @@ const MenubarSubTrigger = React.forwardRef(({ className, inset, children, ...pro
   <MenubarPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-emerald-200 data-[state=open]:bg-accent data-[state=open]:text-emerald-200",
+      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-task data-[state=open]:bg-dark-task data-[state=open]:text-task",
       inset && "pl-8",
       className
     )}
@@ -55,7 +55,7 @@ const MenubarSubContent = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-sigesis text-white p-1 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-task text-white p-1 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       className
     )}
     {...props} />
@@ -73,7 +73,7 @@ const MenubarContent = React.forwardRef((
       alignOffset={alignOffset}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 min-w-[12rem] bg-sigesis cursor-pointer text-white overflow-hidden rounded-b-[6px] border-no p-1 shadow-md data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-[12rem] bg-task cursor-pointer text-dark-task overflow-hidden rounded-b-[6px] border-no p-1 shadow-lg shadow-task data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       )}
       {...props} />
@@ -85,7 +85,7 @@ const MenubarItem = React.forwardRef(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Item
     ref={ref}
     className={cn(
-      "relative cursor-pointer flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-sigesis focus:text-emerald-200 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative cursor-pointer flex select-none items-center rounded-[6px] px-2 py-1.5 text-sm outline-none focus:bg-dark-task focus:text-task data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
     )}
@@ -97,7 +97,7 @@ const MenubarCheckboxItem = React.forwardRef(({ className, children, checked, ..
   <MenubarPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-sigesis focus:text-emerald-200 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-task focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     checked={checked}

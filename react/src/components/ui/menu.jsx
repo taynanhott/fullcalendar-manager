@@ -33,11 +33,9 @@ export function MenuSide() {
         Promise.all([
             axiosClient.get("/routes"),
             axiosClient.get("/subroutes"),
-            axiosClient.get("/users"),
-        ]).then(([routesRes, subRoutesRes, usersRes]) => {
+        ]).then(([routesRes, subRoutesRes]) => {
             setRoutes(routesRes.data);
             setSubRoutes(subRoutesRes.data);
-            setUser(usersRes.data);
         });
     }, []);
 
@@ -45,10 +43,10 @@ export function MenuSide() {
         <Sheet key="left">
             <SheetTrigger>
                 <Button className="border-none" variant="outline" size="icon" aria-label="Abrir menu">
-                    <Menu className="text-white" />
+                    <Menu className="text-dark-task" />
                 </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="bg-emerald-800 bor">
+            <SheetContent side="left" className="bg-dark-task bor">
                 <SheetHeader>
                     <SheetTitle></SheetTitle>
                     <SheetDescription>
@@ -60,7 +58,7 @@ export function MenuSide() {
                                         .filter((subElement) => subElement.route_id === element.id)
                                         .map((subRoute) => (
                                             <AccordionContent>
-                                                <Link className="text-white hover:text-emerald-300" to={subRoute.route}>{subRoute.name}</Link>
+                                                <Link className="text-dark-task hover:text-white" to={subRoute.route}>{subRoute.name}</Link>
                                             </AccordionContent>
                                         ))
                                     }
@@ -82,11 +80,9 @@ export function MenuTop() {
         Promise.all([
             axiosClient.get("/routes"),
             axiosClient.get("/subroutes"),
-            axiosClient.get("/users"),
-        ]).then(([routesRes, subRoutesRes, usersRes]) => {
+        ]).then(([routesRes, subRoutesRes]) => {
             setRoutes(routesRes.data);
             setSubRoutes(subRoutesRes.data);
-            setUser(usersRes.data);
         });
     }, []);
 
@@ -101,7 +97,7 @@ export function MenuTop() {
                             .map((subRoute) => (
                                 <>
                                     <MenubarItem asChild>
-                                        <Link className="text-white hover:text-emerald-300" to={subRoute.route}>{subRoute.name}</Link>
+                                        <Link className="text-dark-task hover:text-task" to={subRoute.route}>{subRoute.name}</Link>
                                     </MenubarItem>
                                 </>
                             ))

@@ -7,6 +7,8 @@ import NotFound from "./views/NotFound";
 import Signup from "./views/Signup";
 import Users from "./views/Users";
 import UserForm from "./views/UserForm.jsx";
+import TaskForm from "./views/TaskForm.jsx";
+import Task from "./views/task.jsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,18 @@ const router = createBrowserRouter([
       {
         path: '/dashboard',
         element: <Dashboard />
+      },
+      {
+        path: '/task',
+        element: <Task />
+      },
+      {
+        path: '/task/new',
+        element: <TaskForm key="taskCreate" />
+      },
+      {
+        path: '/task/:id',
+        element: <TaskForm key="taskUpdate" />
       },
       {
         path: '/users',
