@@ -11,3 +11,15 @@
 html {
     scrollbar-width: none;
 }
+
+.cs-message__content, .cs-message-input__content-editor-wrapper, .cs-message-input__content-editor{
+    background-color: #E9D6D0 !important;
+}
+
+.cs-message-input__content-editor-wrapper{
+    margin-left: 2% !important;
+}
+
+.cs-button--attachment{
+    display: none !important
+}

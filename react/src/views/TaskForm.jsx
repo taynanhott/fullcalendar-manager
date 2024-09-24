@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
+import { Textarea } from "@/components/ui/textarea";
 import {
     Select,
     SelectContent,
@@ -11,6 +12,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select.jsx";
+import {
+    MainContainer,
+    ChatContainer,
+    MessageList,
+    Message,
+    MessageInput,
+    TypingIndicator
+} from '@chatscope/chat-ui-kit-react';
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+
+const API_KEY = import.meta.env.VITE_CHATBOT_KEY;
+const systemMessage = {
+    "role": "system", "content": "Respond in the same language that I write."
+}
 
 export default function TaskForm() {
 
@@ -28,11 +43,20 @@ export default function TaskForm() {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState(null);
     const { setNotification } = useStateContext();
+    const [isTyping, setIsTyping] = useState(false);
+    const [messages, setMessages] = useState([
+        {
+            message: "Hello, I'm your assistant! How can I help you with your tasks?",
+            sentTime: "just now",
+            direction: 'ingoing',
+            sender: "ChatGPT"
+        }
+    ]);
 
     if (id) {
         useEffect(() => {
             setLoading(true)
-            axiosClient.get(`/users/${id}`)
+            axiosClient.get(`/task/${id}`)
                 .then(({ data }) => {
                     setLoading(false);
                     setTask(data);
@@ -43,6 +67,62 @@ export default function TaskForm() {
         }, [])
     }
 
+
+    const handleSend = async (message) => {
+        const newMessage = {
+            message,
+            direction: 'outgoing',
+            sender: "user"
+        };
+
+        const newMessages = [...messages, newMessage];
+
+        setMessages(newMessages);
+        setIsTyping(true);
+        await processMessageToChatGPT(newMessages);
+    };
+
+    async function processMessageToChatGPT(chatMessages) {
+
+        let apiMessages = chatMessages.map((messageObject) => {
+            let role = "";
+            if (messageObject.sender === "ChatGPT") {
+                role = "assistant";
+            } else {
+                role = "user";
+            }
+            return { role: role, content: messageObject.message }
+        });
+
+        const apiRequestBody = {
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                systemMessage,
+                ...apiMessages
+            ]
+        }
+
+        await fetch("https://api.openai.com/v1/chat/completions",
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + API_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(apiRequestBody)
+            }).then((data) => {
+                return data.json();
+            }).then((data) => {
+                console.log(data);
+                setMessages([...chatMessages, {
+                    message: data.choices[0].message.content,
+                    direction: 'ingoing',
+                    sender: "ChatGPT"
+                }]);
+                setIsTyping(false);
+            });
+    }
+
     const onSubmit = ev => {
         ev.preventDefault();
 
@@ -50,7 +130,7 @@ export default function TaskForm() {
             axiosClient.put(`/task/${task.id}`, task)
                 .then(() => {
                     setNotification('User was successfully updated');
-                    navigate('/users');
+                    navigate('/task');
                 })
                 .catch(err => {
                     const response = err.response;
@@ -74,60 +154,123 @@ export default function TaskForm() {
     }
 
     return (
-        <div className="max-w-2xl min-h-[332px] mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl">
-            <div className="flex justify-between items-center">
-                {!loading ?
-                    <>
-                        {task.id && <h1 className="mb-2 font-bold text-lg">Update Task: {task.name}</h1>}
-                        {!task.id && <h1 className="mb-2 font-bold text-lg">New Task</h1>}
-                    </> : <></>
-                }
+        <div className="max-w-7xl min-h-[435px] mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl flex">
+            <div className="w-1/2 pr-4">
+                <div className="flex justify-between items-center">
+                    {!loading ? (
+                        <>
+                            {task.id && <h1 className="mb-2 font-bold text-lg">Update Task: {task.name}</h1>}
+                            {!task.id && <h1 className="mb-2 font-bold text-lg">New Task</h1>}
+                        </>
+                    ) : null}
 
-            </div>
-            <div>
-                {loading && (
-                    <div className="text-center my-auto font-bold">
-                        Loading...
-                    </div>
-                )}
-                {errors &&
-                    <div className="bg-red-500 rounded-[6px] mb-4 p-4 text-white font-bold">
-                        {Object.keys(errors).map(key => (
-                            <p key={key}>{errors[key][0]}</p>
-                        ))}
-                    </div>
-                }
-                {!loading && (
-                    <form onSubmit={onSubmit}>
-                        <Input className="mb-4" value={task.name} onChange={ev => setTask({ ...task, name: ev.target.value })} placeholder="Name" />
-                        <Select>
-                            <SelectTrigger className="mb-4">
-                                <SelectValue placeholder="Theme" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="light">Light</SelectItem>
-                                <SelectItem value="dark">Dark</SelectItem>
-                                <SelectItem value="system">System</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select>
-                            <SelectTrigger className="mb-4">
-                                <SelectValue placeholder="Theme" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="light">Light</SelectItem>
-                                <SelectItem value="dark">Dark</SelectItem>
-                                <SelectItem value="system">System</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Input className="mb-4" value={task.priority} onChange={ev => setTask({ ...task, observation: ev.target.value })} placeholder="Priority" />
-                        <Input className="mb-4" value={task.observation} onChange={ev => setTask({ ...task, observation: ev.target.value })} placeholder="Priority" />
-                        <div className="flex justify-end">
-                            <Button type="button" variant="destructive" className="mr-2"><Link to="/users">Cancel</Link></Button>
-                            <Button>Save</Button>
+                </div>
+                <div>
+                    {loading && (
+                        <div className="text-center my-auto font-bold">Loading...</div>
+
+
+                    )}
+                    {errors && (
+                        <div className="bg-red-500 rounded-[6px] mb-4 p-4 text-white font-bold">
+                            {Object.keys(errors).map((key) => (
+                                <p key={key}>{errors[key][0]}</p>
+                            ))}
                         </div>
-                    </form>
-                )}
+                    )}
+                    {!loading && (
+                        <form onSubmit={onSubmit}>
+                            <label>Task name</label>
+                            <Input
+                                className="mb-4"
+                                value={task.name}
+                                onChange={(ev) => setTask({ ...task, name: ev.target.value })}
+                                placeholder="Name"
+                            />
+                            <div className="flex mb-4">
+                                <div className="mr-2 w-1/2">
+                                    <label>Category</label>
+                                    <Select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Theme" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="1">Studies</SelectItem>
+                                            <SelectItem value="2">Work</SelectItem>
+                                            <SelectItem value="3">Friends</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="w-1/2">
+                                    <label>Sub-category</label>
+                                    <Select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Theme" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="1">Studies</SelectItem>
+                                            <SelectItem value="2">Work</SelectItem>
+                                            <SelectItem value="3">Friends</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="flex">
+                                <div className="mr-2 w-1/2">
+                                    <label>Date</label>
+                                    <Input
+                                        type="date"
+                                        className="mb-4"
+                                        value={task.date}
+                                        onChange={(ev) => setTask({ ...task, date: ev.target.value })}
+                                        placeholder="Date"
+                                    />
+                                </div>
+                                <div className="w-1/2">
+                                    <label>Priority</label>
+                                    <Select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Priority" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="1">Baixo</SelectItem>
+                                            <SelectItem value="2">Médio</SelectItem>
+                                            <SelectItem value="3">Alto</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <label>Observation</label>
+                            <Textarea
+                                className="mb-4 resize-none"
+                                value={task.observation}
+                                onChange={(ev) => setTask({ ...task, observation: ev.target.value })}
+                                placeholder="Write your observation..."
+                            />
+                            <div className="flex justify-end">
+                                <Button type="button" variant="destructive" className="mr-2">
+                                    <Link to="/task">Cancel</Link>
+                                </Button>
+                                <Button>Save</Button>
+                            </div>
+                        </form>
+                    )}
+                </div>
+            </div>
+            <div className="w-1/2 pl-4 h-[435px]">
+                <MainContainer>
+                    <ChatContainer>
+                        <MessageList
+                            scrollBehavior="smooth"
+                            typingIndicator={isTyping ? <TypingIndicator content="ChatGPT is typing" /> : null}
+                        >
+                            {messages.map((message, i) => (
+                                <Message key={i} model={message} />
+                            ))}
+                        </MessageList>
+                        <MessageInput placeholder="Type message here" onSend={handleSend} />
+                    </ChatContainer>
+                </MainContainer>
             </div>
         </div>
     )

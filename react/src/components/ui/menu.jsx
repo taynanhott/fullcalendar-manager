@@ -94,14 +94,16 @@ export function MenuTop() {
                     <MenubarContent>
                         {subRoutes
                             .filter((subElement) => subElement.route_id === element.id)
-                            .map((subRoute) => (
-                                <>
-                                    <MenubarItem asChild>
-                                        <Link className="text-dark-task hover:text-task" to={subRoute.route}>{subRoute.name}</Link>
-                                    </MenubarItem>
-                                </>
-                            ))
-                        }
+                            .map((subRoute, subIndex) => (
+                                <MenubarItem asChild key={`subroute-${subIndex}`}>
+                                    <Link
+                                        className="text-dark-task hover:text-task"
+                                        to={subRoute.route}
+                                    >
+                                        {subRoute.name}
+                                    </Link>
+                                </MenubarItem>
+                            ))}
                     </MenubarContent>
                 </MenubarMenu>
             ))}

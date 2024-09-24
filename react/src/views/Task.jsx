@@ -17,7 +17,7 @@ export default function Task() {
     if (!window.confirm("Are you sure you want to delete this user?")) {
       return
     }
-    axiosClient.delete(`/users/${user.id}`)
+    axiosClient.delete(`/task/${user.id}`)
       .then(() => {
         setNotification('User was successfully deleted')
         getUsers()
@@ -26,7 +26,7 @@ export default function Task() {
 
   const getUsers = () => {
     setLoading(true)
-    axiosClient.get('/users')
+    axiosClient.get('/task')
       .then(({ data }) => {
         setLoading(false)
         setUsers(data.data)
@@ -39,9 +39,9 @@ export default function Task() {
   return (
     <div className="max-w-2xl min-h-[332px] mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="mb-2 font-bold text-lg">Users</h1>
+        <h1 className="mb-2 font-bold text-lg">Tasks List</h1>
         <Button type="button">
-          <Link to="/users/new">Add new</Link>
+          <Link to="/task/new">Add new</Link>
         </Button>
       </div>
       {loading ?
@@ -75,7 +75,7 @@ export default function Task() {
                     <td className="px-6 py-4 whitespace-nowrap">{u.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{u.created_at}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Link className="text-indigo-600 hover:text-indigo-900" to={'/users/' + u.id}>Edit</Link>
+                      <Link className="text-indigo-600 hover:text-indigo-900" to={'/task/' + u.id}>Edit</Link>
                       <button className="ml-4 text-red-600 hover:text-red-900" onClick={() => onDeleteClick(u)}>Delete</button>
                     </td>
                   </tr>
