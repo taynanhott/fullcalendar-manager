@@ -9,6 +9,9 @@ import Users from "./views/Users";
 import UserForm from "./views/UserForm.jsx";
 import TaskForm from "./views/TaskForm.jsx";
 import Task from "./views/task.jsx";
+import { Cronogram } from "./views/Cronogram.jsx";
+import { Category } from "./views/Category.jsx";
+import { CategoryForm } from "./views/CategoryForm.jsx";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +37,18 @@ const router = createBrowserRouter([
       {
         path: '/task/:id',
         element: <TaskForm key="taskUpdate" />
+      },
+      {
+        path: '/cronogram',
+        element: <Cronogram />
+      },
+      {
+        path: '/category',
+        element: <Category />
+      },
+      {
+        path: '/category/new',
+        element: <CategoryForm />
       },
       {
         path: '/users',

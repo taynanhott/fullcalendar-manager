@@ -154,22 +154,19 @@ export default function TaskForm() {
     }
 
     return (
-        <div className="max-w-7xl min-h-[435px] mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl flex">
-            <div className="w-1/2 pr-4">
+        <div className="max-w-7xl min-h-[435px] mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl flex flex-col lg:flex-row">
+            <div className="w-full lg:w-1/2 pr-0 lg:pr-4">
                 <div className="flex justify-between items-center">
                     {!loading ? (
                         <>
                             {task.id && <h1 className="mb-2 font-bold text-lg">Update Task: {task.name}</h1>}
-                            {!task.id && <h1 className="mb-2 font-bold text-lg">New Task</h1>}
+                            {!task.id && <h1 className="mb-2 font-bold text-lg">Create new Task</h1>}
                         </>
                     ) : null}
-
                 </div>
                 <div>
                     {loading && (
                         <div className="text-center my-auto font-bold">Loading...</div>
-
-
                     )}
                     {errors && (
                         <div className="bg-red-500 rounded-[6px] mb-4 p-4 text-white font-bold">
@@ -188,11 +185,11 @@ export default function TaskForm() {
                                 placeholder="Name"
                             />
                             <div className="flex mb-4">
-                                <div className="mr-2 w-1/2">
+                                <div className="mr-2 w-full lg:w-1/2">
                                     <label>Category</label>
                                     <Select>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Theme" />
+                                            <SelectValue placeholder="Select the category" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="1">Studies</SelectItem>
@@ -201,11 +198,11 @@ export default function TaskForm() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="w-1/2">
+                                <div className="w-full lg:w-1/2">
                                     <label>Sub-category</label>
                                     <Select>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Theme" />
+                                            <SelectValue placeholder="Select the sub-category" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="1">Studies</SelectItem>
@@ -216,26 +213,26 @@ export default function TaskForm() {
                                 </div>
                             </div>
                             <div className="flex">
-                                <div className="mr-2 w-1/2">
-                                    <label>Date</label>
+                                <div className="mr-2 w-full lg:w-1/2">
+                                    <label>Duration</label>
                                     <Input
-                                        type="date"
+                                        type="time"
                                         className="mb-4"
                                         value={task.date}
                                         onChange={(ev) => setTask({ ...task, date: ev.target.value })}
-                                        placeholder="Date"
+                                        placeholder="time"
                                     />
                                 </div>
-                                <div className="w-1/2">
+                                <div className="w-full lg:w-1/2">
                                     <label>Priority</label>
                                     <Select>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Priority" />
+                                            <SelectValue placeholder="Select the priority level" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="1">Baixo</SelectItem>
-                                            <SelectItem value="2">Médio</SelectItem>
-                                            <SelectItem value="3">Alto</SelectItem>
+                                            <SelectItem value="1">Low</SelectItem>
+                                            <SelectItem value="2">Medium</SelectItem>
+                                            <SelectItem value="3">High</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -248,16 +245,13 @@ export default function TaskForm() {
                                 placeholder="Write your observation..."
                             />
                             <div className="flex justify-end">
-                                <Button type="button" variant="destructive" className="mr-2">
-                                    <Link to="/task">Cancel</Link>
-                                </Button>
-                                <Button>Save</Button>
+                                <Button className="w-full">Save new task</Button>
                             </div>
                         </form>
                     )}
                 </div>
             </div>
-            <div className="w-1/2 pl-4 h-[435px]">
+            <div className="w-full lg:w-1/2 pl-0 lg:pl-4 mt-4 lg:mt-0 h-[435px]">
                 <MainContainer>
                     <ChatContainer>
                         <MessageList

@@ -58,7 +58,7 @@ export function MenuSide() {
                                         .filter((subElement) => subElement.route_id === element.id)
                                         .map((subRoute) => (
                                             <AccordionContent>
-                                                <Link className="text-dark-task hover:text-white" to={subRoute.route}>{subRoute.name}</Link>
+                                                <Link className="text-task hover:text-task/50" to={subRoute.route}>{subRoute.name}</Link>
                                             </AccordionContent>
                                         ))
                                     }
