@@ -9,9 +9,9 @@ import Users from "./views/Users";
 import UserForm from "./views/UserForm.jsx";
 import TaskForm from "./views/TaskForm.jsx";
 import Task from "./views/task.jsx";
-import { Cronogram } from "./views/Cronogram.jsx";
 import { Category } from "./views/Category.jsx";
 import { CategoryForm } from "./views/CategoryForm.jsx";
+import Cronogram from "./views/Cronogram.jsx";
 
 const router = createBrowserRouter([
   {

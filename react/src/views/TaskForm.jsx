@@ -154,7 +154,7 @@ export default function TaskForm() {
     }
 
     return (
-        <div className="max-w-7xl min-h-[435px] mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl flex flex-col lg:flex-row">
+        <div className="max-w-7xl min-h-[435px] mx-auto text-dark-task bg-white rounded-[6px] p-4 mt-4 shadow-xl flex flex-col lg:flex-row">
             <div className="w-full lg:w-1/2 pr-0 lg:pr-4">
                 <div className="flex justify-between items-center">
                     {!loading ? (
@@ -251,7 +251,7 @@ export default function TaskForm() {
                     )}
                 </div>
             </div>
-            <div className="w-full lg:w-1/2 pl-0 lg:pl-4 mt-4 lg:mt-0 h-[435px]">
+            <div className="w-full lg:w-1/2 pl-0 lg:pl-4 mt-4 lg:mt-0 h-[435px] ">
                 <MainContainer>
                     <ChatContainer>
                         <MessageList
