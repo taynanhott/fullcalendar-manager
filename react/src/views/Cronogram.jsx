@@ -6,6 +6,7 @@ import { ChevronsRight, ChevronsLeft } from "lucide-react";
 import { useState } from "react";
 import moment from "moment";
 import { Accordion } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
 
 export default function Cronogram() {
     const [selectedTasks, setSelectedTasks] = useState([]);
@@ -39,19 +40,34 @@ export default function Cronogram() {
                         <label className="font-bold">{month.format('MMMM YYYY')}</label>
                         <div><Button onClick={() => handleChangeMonth('next')} type="button" className="font-bold"><ChevronsRight /></Button></div>
                     </div>
+                    <div className="flex items-center mt-2 gap-2">
+                        <Input className="w-4" type="checkbox" />
+                        <p className="">Only Weekend</p>
+                    </div>
                     <ScrollArea
                         className="w-full rounded-md border px-4 mt-2 overflow-auto"
-                        style={{ height: `${screenHeight * .65}px` }}
+                        style={{ height: `${screenHeight * .60}px` }}
                     >
                         <Accordion type="single" collapsible>
                             {Array.from({ length: daysInMonth }, (_, index) => (
-                                <Timeline date={month} key={index + 1} day={index + 1} /> // Passando o dia como prop
+                                <div className="flex">
+                                    <Input className="w-4" type="checkbox" />
+                                    <Timeline
+                                    className="w-full"
+                                        selectedTasks={selectedTasks}
+                                        setSelectedTasks={setSelectedTasks}
+                                        date={month}
+                                        key={index + 1}
+                                        day={index + 1}
+                                    />
+                                </div>
                             ))}
-                            </Accordion>
+                        </Accordion>
                     </ScrollArea>
                 </form>
             </div>
         </div>
     );
 }
+
 

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "./button";
 import Hour from "./hour";
-import PrioritySelector from "./star";
+import PrioritySelector from "./priority";
 
 export default function TaskCard({
     id,
@@ -40,7 +40,7 @@ export default function TaskCard({
     };
 
     return (
-        <Card className={`w-full rounded-[16px] grid grid-cols-4 md:grid-cols-12 lg:grid-cols-12 bg-white cursor-pointer text-dark-task ${className} ${selected ? "bg-red-500" : ""}`}>
+        <Card className={`w-full rounded-[16px] grid grid-cols-4 md:grid-cols-12 lg:grid-cols-12 bg-white cursor-pointer text-dark-task ${className} ${selected ? "border-blue-500/85" : ""}`}>
             <CardHeader className="py-2 col-span-3 md:col-span-11 lg:col-span-11">
                 <CardTitle className="flex items-center gap-2">
                     <ClipboardListIcon className="h-5 w-5 hidden lg:flex" />
@@ -53,7 +53,7 @@ export default function TaskCard({
                     onClick={handleButtonClick}
                     className={`w-full rounded-r-[6px] hover:bg-dark-task flex items-center justify-center rounded-l-[0px] h-full ${variant === "selected" ? "bg-red-500/85" : "bg-blue-500/85"} text-white rounded`}
                 >
-                    {selected ? <RotateCcw /> : variant === "selected" ? <Trash/> : <Plus />}
+                    {selected ? <RotateCcw /> : variant === "selected" ? <Trash /> : <Plus />}
                 </button>
             </div>
             <CardContent className="py-0 lg:py-2 col-span-3 md:col-span-11 lg:col-span-11 mb-2">
@@ -126,9 +126,18 @@ export function TaskList({ className = "", selectedTasks = [], setSelectedTasks 
     );
 }
 
-export function TaskTimeDialog({ className }) {
+export function TaskTimeDialog({ selectedTasks, setSelectedTasks, onSave, className }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleAddTask = () => {
+        if (typeof onSave === 'function') {
+            onSave(selectedTasks);
+        }
+        setIsOpen(false);
+    };
+
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger className={`${className} border h-8 bg-background hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center whitespace-nowrap rounded-[6px] text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full text-dark-task hover:text-task bg-task hover:bg-dark-task border-dark-task/40`}>
                 <Plus className="mx-auto h-4 w-4 " />
             </DialogTrigger>
@@ -140,21 +149,24 @@ export function TaskTimeDialog({ className }) {
                     </DialogDescription>
                 </DialogHeader>
                 <Hour className="w-36 mx-auto py-2" variant="fixed" />
-                <Button type="button" className="mx-4">Save</Button>
+                <Button type="button" className="mx-4" onClick={handleAddTask}>Save</Button>
             </DialogContent>
         </Dialog>
     )
 }
 
 export function TaskListDialog({ selectedTasks, setSelectedTasks, onSave, className }) {
+    const [isOpen, setIsOpen] = useState(false);
+
     const handleAddTask = () => {
         if (typeof onSave === 'function') {
             onSave(selectedTasks);
         }
+        setIsOpen(false);
     };
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}> {/* Use a prop open e onOpenChange para controlar o diálogo */}
             <DialogTrigger className={`${className} border h-8 bg-background hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center whitespace-nowrap rounded-[6px] text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full text-dark-task hover:text-task bg-task hover:bg-dark-task border-dark-task/40`}>
                 <Plus className="h-4 w-4 " />
             </DialogTrigger>
@@ -168,3 +180,4 @@ export function TaskListDialog({ selectedTasks, setSelectedTasks, onSave, classN
         </Dialog>
     );
 }
+

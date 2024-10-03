@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosClient from "../axios-client.js";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
@@ -22,7 +22,7 @@ import {
 } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import Hour from "@/components/ui/hour.jsx";
-import PrioritySelector from "@/components/ui/star.jsx";
+import PrioritySelector from "@/components/ui/priority.jsx";
 
 const API_KEY = import.meta.env.VITE_CHATBOT_KEY;
 const systemMessage = {
