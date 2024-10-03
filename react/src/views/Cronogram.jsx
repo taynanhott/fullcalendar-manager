@@ -42,6 +42,8 @@ export default function Cronogram() {
                     </div>
                     <div className="flex items-center mt-2 gap-2">
                         <Input className="w-4" type="checkbox" />
+                        <p className="">Select All</p>
+                        <Input className="w-4" type="checkbox" />
                         <p className="">Only Weekend</p>
                     </div>
                     <ScrollArea
@@ -50,7 +52,7 @@ export default function Cronogram() {
                     >
                         <Accordion type="single" collapsible>
                             {Array.from({ length: daysInMonth }, (_, index) => (
-                                <div className="flex">
+                                <div className="flex items-center gap-2">
                                     <Input className="w-4" type="checkbox" />
                                     <Timeline
                                     className="w-full"
