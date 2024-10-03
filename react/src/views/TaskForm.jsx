@@ -21,6 +21,8 @@ import {
     TypingIndicator
 } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+import Hour from "@/components/ui/hour.jsx";
+import PrioritySelector from "@/components/ui/star.jsx";
 
 const API_KEY = import.meta.env.VITE_CHATBOT_KEY;
 const systemMessage = {
@@ -215,26 +217,11 @@ export default function TaskForm() {
                             <div className="flex">
                                 <div className="mr-2 w-full lg:w-1/2">
                                     <label>Duration</label>
-                                    <Input
-                                        type="time"
-                                        className="mb-4"
-                                        value={task.date}
-                                        onChange={(ev) => setTask({ ...task, date: ev.target.value })}
-                                        placeholder="time"
-                                    />
+                                    <Hour className="" variant="popover" />
                                 </div>
                                 <div className="w-full lg:w-1/2">
                                     <label>Priority</label>
-                                    <Select>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select the priority level" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="1">Low</SelectItem>
-                                            <SelectItem value="2">Medium</SelectItem>
-                                            <SelectItem value="3">High</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <PrioritySelector variant="form" />
                                 </div>
                             </div>
                             <label>Observation</label>

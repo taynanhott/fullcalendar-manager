@@ -25,7 +25,7 @@ import {
 import { Menu } from "lucide-react";
 import { Button } from "./button";
 
-export function MenuSide() {
+export function MenuSide({ className = "" }) {
     const [routes, setRoutes] = useState([]);
     const [subRoutes, setSubRoutes] = useState([]);
 
@@ -41,7 +41,7 @@ export function MenuSide() {
 
     return (
         <Sheet key="left">
-            <SheetTrigger>
+            <SheetTrigger className={className}>
                 <Button className="border-none" variant="outline" size="icon" aria-label="Abrir menu">
                     <Menu className="text-dark-task" />
                 </Button>
@@ -72,7 +72,7 @@ export function MenuSide() {
     );
 }
 
-export function MenuTop() {
+export function MenuTop({ className = "" }) {
     const [routes, setRoutes] = useState([]);
     const [subRoutes, setSubRoutes] = useState([]);
 
@@ -87,7 +87,7 @@ export function MenuTop() {
     }, []);
 
     return (
-        <Menubar>
+        <Menubar className={className}>
             {routes.map((element, index) => (
                 <MenubarMenu key={`route-${index}`} >
                     <MenubarTrigger>{element.name}</MenubarTrigger>

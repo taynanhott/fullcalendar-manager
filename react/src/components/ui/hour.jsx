@@ -40,29 +40,33 @@ export default function Hour({ variant = "fixed", className = "" }) {
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
     }
 
+    const handleClick = () => {
+        document.getElementById('time-input')?.focus()
+    }
+
     return (
         variant === "popover" ? (
             <div className={className}>
                 <Popover>
-                    < PopoverTrigger asChild >
-                        <Button variant="outline" className="w-[180px] justify-start text-left font-normal">
+                    <PopoverTrigger asChild >
+                        <Button variant="outline" className="border-dark-task/20 w-full justify-start text-left font-normal">
                             <Clock className="mr-2 h-4 w-4" />
                             {formatTime(time.hours, time.minutes)}
                         </Button>
                     </PopoverTrigger >
-                    <PopoverContent className="w-80">
+                    <PopoverContent className="w-80 bg-white">
                         <div className="grid gap-4">
                             <div className="space-y-2">
-                                <h4 className="font-medium leading-none">Selecione a hora do dia</h4>
+                                <h4 className="font-medium leading-none">Select an hour</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Ajuste as horas e minutos para qualquer momento do dia.
+                                    Choose a time of task duration.
                                 </p>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="hours">Horas</Label>
                                     <div className="flex items-center">
-                                        <Button size="icon" variant="outline" onClick={decrementHours}>-</Button>
+                                        <Button size="icon" onClick={decrementHours}>-</Button>
                                         <Input
                                             id="hours"
                                             className="w-14 mx-2 text-center"
@@ -71,13 +75,13 @@ export default function Hour({ variant = "fixed", className = "" }) {
                                             min={0}
                                             max={23}
                                         />
-                                        <Button size="icon" variant="outline" onClick={incrementHours}>+</Button>
+                                        <Button size="icon" onClick={incrementHours}>+</Button>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="minutes">Minutos</Label>
                                     <div className="flex items-center">
-                                        <Button size="icon" variant="outline" onClick={decrementMinutes}>-</Button>
+                                        <Button size="icon" onClick={decrementMinutes}>-</Button>
                                         <Input
                                             id="minutes"
                                             className="w-14 mx-2 text-center"
@@ -86,7 +90,7 @@ export default function Hour({ variant = "fixed", className = "" }) {
                                             min={0}
                                             max={59}
                                         />
-                                        <Button size="icon" variant="outline" onClick={incrementMinutes}>+</Button>
+                                        <Button size="icon" onClick={incrementMinutes}>+</Button>
                                     </div>
                                 </div>
                             </div>
@@ -96,47 +100,24 @@ export default function Hour({ variant = "fixed", className = "" }) {
             </div>
         ) : (
             <div className={className}>
-                <div className="grid gap-4">
-                    <div className="space-y-2">
-                        <h4 className="font-medium leading-none">Selecione a hora do dia</h4>
-                        <p className="text-sm text-muted-foreground">
-                            Ajuste as horas e minutos para qualquer momento do dia.
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="hours">Horas</Label>
-                            <div className="flex items-center">
-                                <Button size="icon" variant="outline" onClick={decrementHours}>-</Button>
-                                <Input
-                                    id="hours"
-                                    className="w-14 mx-2 text-center"
-                                    value={time.hours.toString().padStart(2, '0')}
-                                    onChange={(e) => handleTimeChange('hours', e.target.value)}
-                                    min={0}
-                                    max={23}
-                                />
-                                <Button size="icon" variant="outline" onClick={incrementHours}>+</Button>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="minutes">Minutos</Label>
-                            <div className="flex items-center">
-                                <Button size="icon" variant="outline" onClick={decrementMinutes}>-</Button>
-                                <Input
-                                    id="minutes"
-                                    className="w-14 mx-2 text-center"
-                                    value={time.minutes.toString().padStart(2, '0')}
-                                    onChange={(e) => handleTimeChange('minutes', e.target.value)}
-                                    min={0}
-                                    max={59}
-                                />
-                                <Button size="icon" variant="outline" onClick={incrementMinutes}>+</Button>
-                            </div>
-                        </div>
+                <div className="flex flex-col items-center">
+                    <Label className="block lg:hidden">Select an hour</Label>
+                    <div
+                        className="relative flex items-center border rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 cursor-pointer mt-2"
+                        onClick={handleClick}
+                    >
+                        <Clock className="absolute left-3 h-5 w-5 text-gray-400" />
+                        <Input
+                            id="time-input"
+                            type="time"
+                            value={time}
+                            onChange={(e) => setTime(e.target.value)}
+                            className="pl-10 cursor-pointer"
+                        />
                     </div>
                 </div>
             </div>
+
         )
     )
 }

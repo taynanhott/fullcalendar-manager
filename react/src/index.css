@@ -4,14 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-::-webkit-scrollbar {
-    display: none;
-}
-
-html {
-    scrollbar-width: none;
-}
-
 .cs-message__content,
 .cs-message-input__content-editor-wrapper,
 .cs-message-input__content-editor {

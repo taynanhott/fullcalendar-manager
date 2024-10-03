@@ -1,55 +1,46 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ClipboardListIcon, Clock, FlagIcon, FolderIcon, Plus, Trash } from "lucide-react";
+import { ClipboardListIcon, Clock, FlagIcon, FolderIcon, Plus, RotateCcw, Trash } from "lucide-react";
 import { useState } from "react";
 import { ScrollArea } from "./scroll-area";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./button";
-import { Input } from "./input";
 import Hour from "./hour";
+import PrioritySelector from "./star";
 
-export default function TaskCard(
-    {
-        name = "Name Task",
-        priority = "Medium",
-        category = "Work",
-        subcategory = "1h",
-        variant = "list",
-        className = ""
-    }
-) {
-    const getPriorityColor = (priority) => {
-        switch (priority.toLowerCase()) {
-            case 'low':
-                return 'bg-green-500'
-            case 'medium':
-                return 'bg-yellow-500'
-            case 'high':
-                return 'bg-red-500'
-            default:
-                return 'bg-gray-500'
-        }
-    }
-
+export default function TaskCard({
+    id,
+    name = "Name Task",
+    category = "Work",
+    subcategory = "1h",
+    variant = "list",
+    className = "",
+    selected = false,
+    onSelect,
+}) {
     const getVariant = (variant) => {
         switch (variant.toLowerCase()) {
-            case 'list':
-                return ''
-            case 'selected':
-                return 'hidden'
+            case "list":
+                return "";
+            case "selected":
+                return "hidden";
             default:
-                return ''
+                return "";
         }
-    }
+    };
+
+    const handleButtonClick = () => {
+        onSelect(id);
+    };
 
     return (
-        <Card className={`w-full rounded-[16px] grid grid-cols-4 md:grid-cols-12 lg:grid-cols-12 bg-white cursor-pointer text-dark-task ${className}`}>
+        <Card className={`w-full rounded-[16px] grid grid-cols-4 md:grid-cols-12 lg:grid-cols-12 bg-white cursor-pointer text-dark-task ${className} ${selected ? "bg-red-500" : ""}`}>
             <CardHeader className="py-2 col-span-3 md:col-span-11 lg:col-span-11">
                 <CardTitle className="flex items-center gap-2">
                     <ClipboardListIcon className="h-5 w-5 hidden lg:flex" />
@@ -57,18 +48,18 @@ export default function TaskCard(
                 </CardTitle>
             </CardHeader>
             <div className="col-span-1 row-span-2">
-                <button type="button" className={`w-full rounded-r-[6px] hover:bg-dark-task flex items-center justify-center rounded-l-[0px] h-full ${variant === "selected" ? "bg-red-500/85" : "bg-blue-500/85"} text-white rounded`}>
-                    {variant === "selected" ? <Trash /> : <Plus />}
+                <button
+                    type="button"
+                    onClick={handleButtonClick}
+                    className={`w-full rounded-r-[6px] hover:bg-dark-task flex items-center justify-center rounded-l-[0px] h-full ${variant === "selected" ? "bg-red-500/85" : "bg-blue-500/85"} text-white rounded`}
+                >
+                    {selected ? <RotateCcw /> : variant === "selected" ? <Trash/> : <Plus />}
                 </button>
             </div>
             <CardContent className="py-0 lg:py-2 col-span-3 md:col-span-11 lg:col-span-11 mb-2">
                 <div className="flex flex-col lg:flex-row justify-between">
-                    <div className={`flex items-center gap-2${getVariant(variant)}`}>
-                        <FlagIcon className="h-4 w-4 hidden lg:flex" />
-                        <span className="text-sm font-medium hidden lg:flex">Priority:</span>
-                        <Badge variant="secondary" alt="Priority" className={`${getPriorityColor(priority)} mx-auto md:mx-0 lg:mx-0 text-white`}>
-                            {priority}
-                        </Badge>
+                    <div className={`flex items-center gap-2 mb-2 lg:mb-0`}>
+                        <PrioritySelector width={4} height={4} />
                     </div>
                     <div className={`flex items-center gap-2 ${getVariant(variant)}`}>
                         <FolderIcon className="h-4 w-4" />
@@ -83,16 +74,23 @@ export default function TaskCard(
                 </div>
             </CardContent>
         </Card>
-
-    )
+    );
 }
 
-export function TaskList({ className = "" }) {
+export function TaskList({ className = "", selectedTasks = [], setSelectedTasks }) {
     const [loading, setLoading] = useState(false);
 
     const onSubmit = ev => {
         ev.preventDefault();
-    }
+    };
+
+    const handleTaskSelect = (id) => {
+        setSelectedTasks((prevSelectedTasks) =>
+            prevSelectedTasks.includes(id)
+                ? prevSelectedTasks.filter((taskId) => taskId !== id)
+                : [...prevSelectedTasks, id]
+        );
+    };
 
     return (
         <div className={`${className} w-full pr-0 lg:pr-4`}>
@@ -107,11 +105,15 @@ export function TaskList({ className = "" }) {
                                 <tbody>
                                     <tr>
                                         <td className="text-center grid gap-2">
-                                            <TaskCard className="hover:bg-task" />
-                                            <TaskCard className="hover:bg-task" />
-                                            <TaskCard className="hover:bg-task" />
-                                            <TaskCard className="hover:bg-task" />
-                                            <TaskCard className="hover:bg-task" />
+                                            {["task-1", "task-2", "task-3", "task-4", "task-5"].map(taskId => (
+                                                <TaskCard
+                                                    key={taskId}
+                                                    id={taskId}
+                                                    className="hover:bg-task"
+                                                    selected={selectedTasks.includes(taskId)}
+                                                    onSelect={handleTaskSelect}
+                                                />
+                                            ))}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -121,26 +123,36 @@ export function TaskList({ className = "" }) {
                 )}
             </div>
         </div>
-    )
+    );
 }
+
 export function TaskTimeDialog({ className }) {
     return (
         <Dialog>
             <DialogTrigger className={`${className} border h-8 bg-background hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center whitespace-nowrap rounded-[6px] text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full text-dark-task hover:text-task bg-task hover:bg-dark-task border-dark-task/40`}>
                 <Plus className="mx-auto h-4 w-4 " />
             </DialogTrigger>
-            <DialogContent className="bg-white rounded-[6px] mx-auto px-0">
+            <DialogContent className="bg-white w-96 rounded-[6px] mx-auto px-0">
                 <DialogHeader>
-                    <DialogTitle className="text-center">Select a hour</DialogTitle>
+                    <DialogTitle className="text-center">Select an hour</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Choose an hour for your task.
+                    </DialogDescription>
                 </DialogHeader>
-                <Hour />
+                <Hour className="w-36 mx-auto py-2" variant="fixed" />
                 <Button type="button" className="mx-4">Save</Button>
             </DialogContent>
         </Dialog>
     )
 }
 
-export function TaskLiastDialog({ className }) {
+export function TaskListDialog({ selectedTasks, setSelectedTasks, onSave, className }) {
+    const handleAddTask = () => {
+        if (typeof onSave === 'function') {
+            onSave(selectedTasks);
+        }
+    };
+
     return (
         <Dialog>
             <DialogTrigger className={`${className} border h-8 bg-background hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center whitespace-nowrap rounded-[6px] text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 w-full text-dark-task hover:text-task bg-task hover:bg-dark-task border-dark-task/40`}>
@@ -148,12 +160,11 @@ export function TaskLiastDialog({ className }) {
             </DialogTrigger>
             <DialogContent className="bg-white rounded-[6px] mx-auto px-0 w-full max-w-[95vw]">
                 <DialogHeader>
-                    <DialogTitle className="text-center">Task's</DialogTitle>
+                    <DialogTitle className="text-center">Task List</DialogTitle>
                 </DialogHeader>
-                <TaskList />
-                <Hour className="bg-red-900" variant="fixed"/>
-                <Button type="button" className="mx-4">Save</Button>
+                <TaskList selectedTasks={selectedTasks} setSelectedTasks={setSelectedTasks} />
+                <Button type="button" className="mx-4" onClick={handleAddTask}>Save</Button>
             </DialogContent>
         </Dialog>
-    )
+    );
 }

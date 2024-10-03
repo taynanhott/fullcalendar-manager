@@ -25,7 +25,8 @@ export default function Header() {
 
     return (
         <header className="flex justify-between w-full items-center px-8 py-2 bg-task shadow-lg shadow-task z-50">
-            {width < 480 ? <MenuSide /> : <MenuTop />}
+            <MenuSide className="lg:hidden" />
+            <MenuTop className="hidden lg:flex" />
             <div>
                 {user.name} &nbsp; &nbsp;
                 <Button className="hover:bg-dark-task text-dark-task font-bold" onClick={onLogout} aria-label="Logout">Logout</Button>
