@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function PrioritySelector({ className, width = 8, height = 8, variant = "view" }) {
+export default function PrioritySelector({ className, width = 6, height = 6, variant = "form" }) {
     const [selected, setSelected] = useState(4)
 
     const getColor = (index) => {

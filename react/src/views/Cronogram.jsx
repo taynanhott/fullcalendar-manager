@@ -1,16 +1,19 @@
 import { TaskList } from "@/components/ui/task";
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Timeline from "@/components/ui/timeline";
 import { Button } from "@/components/ui/button";
 import { ChevronsRight, ChevronsLeft } from "lucide-react";
 import { useState } from "react";
 import moment from "moment";
 import { Accordion } from "@/components/ui/accordion";
-import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Cronogram() {
     const [selectedTasks, setSelectedTasks] = useState([]);
     const [month, setMonth] = useState(moment());
+    const [selectAll, setSelectAll] = useState(false);
+    const [weekends, setWeekends] = useState(true);
+    const [checkedItems, setCheckedItems] = useState({});
     const screenHeight = window.innerHeight;
     const daysInMonth = month.daysInMonth();
 
@@ -27,6 +30,26 @@ export default function Cronogram() {
         }
     };
 
+    const handleSelectAll = () => {
+        const newCheckedItems = {};
+        Array.from({ length: daysInMonth }).forEach((_, index) => {
+            newCheckedItems[index + 1] = !selectAll;
+        });
+        setCheckedItems(newCheckedItems);
+        setSelectAll(!selectAll);
+    };
+
+    const handleCheckboxChange = (day) => {
+        setCheckedItems(prevState => ({
+            ...prevState,
+            [day]: !prevState[day],
+        }));
+    };
+
+    const handleWeekendChange = () => {
+        setWeekends(!weekends);
+    };
+
     return (
         <div
             className="text-dark-task max-w-7xl mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl flex flex-col lg:flex-row"
@@ -41,29 +64,38 @@ export default function Cronogram() {
                         <div><Button onClick={() => handleChangeMonth('next')} type="button" className="font-bold"><ChevronsRight /></Button></div>
                     </div>
                     <div className="flex items-center mt-2 gap-2">
-                        <Input className="w-4" type="checkbox" />
-                        <p className="">Select All</p>
-                        <Input className="w-4" type="checkbox" />
-                        <p className="">Only Weekend</p>
+                        <Checkbox checked={selectAll} onCheckedChange={handleSelectAll} />
+                        <p>Select All</p>
+                        <Checkbox checked={weekends} onCheckedChange={handleWeekendChange} />
+                        <p>No Weekends</p>
                     </div>
-                    <ScrollArea
-                        className="w-full rounded-md border px-4 mt-2 overflow-auto"
-                        style={{ height: `${screenHeight * .60}px` }}
-                    >
-                        <Accordion type="single" collapsible>
-                            {Array.from({ length: daysInMonth }, (_, index) => (
-                                <div className="flex items-center gap-2">
-                                    <Input className="w-4" type="checkbox" />
-                                    <Timeline
-                                    className="w-full"
-                                        selectedTasks={selectedTasks}
-                                        setSelectedTasks={setSelectedTasks}
-                                        date={month}
-                                        key={index + 1}
-                                        day={index + 1}
-                                    />
-                                </div>
-                            ))}
+                    <ScrollArea className="w-full rounded-md border px-4 mt-2" style={{ height: `${screenHeight * .60}px` }}>
+                        <Accordion type="multiple" collapsible>
+                            {Array.from({ length: daysInMonth }, (_, index) => {
+                                const day = index + 1;
+                                const isWeekend = moment(month).date(day).day() === 0 || moment(month).date(day).day() === 6;
+
+                                return (
+                                    <div className="flex items-start gap-2" key={day}>
+                                        {(!weekends || !isWeekend) && (
+                                            <>
+                                                <Checkbox
+                                                    className="mt-[18px]"
+                                                    checked={checkedItems[day] || false}
+                                                    onCheckedChange={() => handleCheckboxChange(day)}
+                                                />
+                                                <Timeline
+                                                    className="w-full"
+                                                    selectedTasks={selectedTasks}
+                                                    setSelectedTasks={setSelectedTasks}
+                                                    date={month}
+                                                    day={day}
+                                                />
+                                            </>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </Accordion>
                     </ScrollArea>
                 </form>
@@ -71,5 +103,3 @@ export default function Cronogram() {
         </div>
     );
 }
-
-

@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/accordion";
 import TaskCard, { TaskListDialog, TaskTimeDialog } from "@/components/ui/task";
 import { useState } from "react";
-import { Input } from "./input";
 
 export default function Timeline({ className = "", date, day, selectedTasks, setSelectedTasks }) {
     const [tasksInTimeline, setTasksInTimeline] = useState([]);
@@ -35,7 +34,7 @@ export default function Timeline({ className = "", date, day, selectedTasks, set
                             </div>
                         ))
                     ) : (
-                        <p>No tasks added</p>
+                        <p className="text-center font-bold pointer-events-none">No tasks added</p>
                     )}
                 </div>
 

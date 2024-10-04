@@ -221,7 +221,7 @@ export default function TaskForm() {
                                 </div>
                                 <div className="w-full lg:w-1/2">
                                     <label>Priority</label>
-                                    <PrioritySelector variant="form" />
+                                    <PrioritySelector className="" />
                                 </div>
                             </div>
                             <label>Observation</label>
