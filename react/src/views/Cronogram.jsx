@@ -84,6 +84,7 @@ export default function Cronogram() {
                                                     checked={checkedItems[day] || false}
                                                     onCheckedChange={() => handleCheckboxChange(day)}
                                                 />
+                                                
                                                 <Timeline
                                                     className="w-full"
                                                     selectedTasks={selectedTasks}

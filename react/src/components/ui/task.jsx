@@ -23,20 +23,14 @@ export default function TaskCard({
     className = "",
     selected = false,
     onSelect,
+    onRemove,
 }) {
-    const getVariant = (variant) => {
-        switch (variant.toLowerCase()) {
-            case "list":
-                return "";
-            case "selected":
-                return "hidden";
-            default:
-                return "";
-        }
-    };
-
     const handleButtonClick = () => {
-        onSelect(id);
+        if (variant === "selected") {
+            onRemove(id);
+        } else {
+            onSelect(id);
+        }
     };
 
     return (
@@ -58,10 +52,10 @@ export default function TaskCard({
             </div>
             <CardContent className="py-0 lg:py-2 col-span-3 md:col-span-11 lg:col-span-11 mb-2">
                 <div className="flex flex-col lg:flex-row justify-between">
-                    <div className={`flex items-center gap-2 mb-2 lg:mb-0`}>
-                        <PrioritySelector width={4} height={4} />
+                    <div className="flex items-center gap-2 mb-2 lg:mb-0">
+                        <PrioritySelector width={4} height={4} variant={variant} />
                     </div>
-                    <div className={`flex items-center gap-2 ${getVariant(variant)}`}>
+                    <div className="flex items-center gap-2">
                         <FolderIcon className="h-4 w-4" />
                         <span className="text-sm font-medium">Category:</span>
                         <span className="text-sm">{category}</span>
@@ -126,7 +120,7 @@ export function TaskList({ className = "", selectedTasks = [], setSelectedTasks 
     );
 }
 
-export function TaskTimeDialog({ selectedTasks, setSelectedTasks, onSave, className }) {
+export function TaskTimeDialog({ selectedTasks, onSave, className }) {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleAddTask = () => {

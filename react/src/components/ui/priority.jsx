@@ -22,7 +22,8 @@ export default function PrioritySelector({ className, width = 6, height = 6, var
             <div className="flex space-x-2">
                 {[1, 2, 3, 4, 5].map((num) => (
                     <button
-                        disabled={variant === "view" ? true : false}
+                        type="button"
+                        disabled={variant === "form" ? false : true}
                         key={num}
                         className={`w-${width} h-${height} rounded-full transition-colors duration-200 ${getColor(num - 1)}`}
                         onClick={() => setSelected(num)}
