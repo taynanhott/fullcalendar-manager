@@ -169,6 +169,7 @@ export function TaskListDialog({ selectedTasks, setSelectedTasks, onSave, classN
                     <DialogTitle className="text-center">Task List</DialogTitle>
                 </DialogHeader>
                 <TaskList selectedTasks={selectedTasks} setSelectedTasks={setSelectedTasks} />
+                <Hour className="w-1/3 mx-auto py-2" variant="fixed" />
                 <Button type="button" className="mx-4" onClick={handleAddTask}>Save</Button>
             </DialogContent>
         </Dialog>
