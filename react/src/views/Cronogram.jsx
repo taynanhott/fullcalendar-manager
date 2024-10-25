@@ -8,9 +8,11 @@ import moment from "moment";
 import { Accordion } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Cronogram() {
     const [selectedTasks, setSelectedTasks] = useState([]);
+    const [tasksInTimeline, setTasksInTimeline] = useState([]);
     const [month, setMonth] = useState(moment());
     const [selectAll, setSelectAll] = useState(false);
     const [weekends, setWeekends] = useState(true);
@@ -41,6 +43,7 @@ export default function Cronogram() {
         Array.from({ length: daysInMonth }).forEach((_, index) => {
             newCheckedItems[index + 1] = !selectAll;
         });
+        console.log(newCheckedItems);
         setCheckedItems(newCheckedItems);
         setSelectAll(!selectAll);
     };
@@ -67,6 +70,30 @@ export default function Cronogram() {
             return [...prevTasks, task];
         });
     };
+
+    const handleAddTaskToTimeline = (newTasks) => {
+        const tasksWithIds = newTasks.map(task => ({
+            ...task,
+            id: uuidv4()
+        }));
+
+        if (multipleSelect) {
+            const selectedDays = Object.keys(checkedItems).filter(day => checkedItems[day]);
+
+            selectedDays.forEach((selectedDay) => {
+                setTasksInTimeline(prevTasks => [
+                    ...prevTasks,
+                    ...tasksWithIds.map(task => ({
+                        ...task,
+                        day: selectedDay,
+                        date: month.clone().date(selectedDay) // Use month here instead of date
+                    }))
+                ]);
+            });
+        }
+    };
+
+
     return (
         <div
             className="text-dark-task max-w-7xl mx-auto bg-white rounded-[6px] p-4 mt-4 shadow-xl flex flex-col lg:flex-row"
@@ -89,13 +116,8 @@ export default function Cronogram() {
                                     <Checkbox checked={weekends} onCheckedChange={handleWeekendChange} />
                                     <p>No Weekends</p>
                                     <TaskTimeDialog
-                                        selectedTasks={selectedTasks}  // Certifique-se que o estado está sendo passado corretamente
-                                        className="hidden lg:block"
-                                    />
-                                    <TaskListDialog
-                                        selectedTasks={selectedTasks}  // Aqui também
-                                        className="block lg:hidden"
-                                    />
+                                        selectedTasks={selectedTasks}
+                                        onSave={handleAddTaskToTimeline} />
                                 </div> : <></>
                         }
 
@@ -111,7 +133,7 @@ export default function Cronogram() {
                                 const isWeekend = moment(month).date(day).day() === 0 || moment(month).date(day).day() === 6;
 
                                 return (
-                                    <div className="flex items-start gap-2" key={day}>
+                                    <div className="flex items-start gap-2" key={`${day}-${month}`}>
                                         {(!weekends || !isWeekend) && (
                                             <>
                                                 {
@@ -128,8 +150,7 @@ export default function Cronogram() {
                                                     setSelectedTasks={setSelectedTasks}
                                                     date={month}
                                                     day={day}
-                                                    multipleSelect={multipleSelect}
-                                                    checkedItems={checkedItems}
+                                                    tasksInTimeline={tasksInTimeline}
                                                 />
                                             </>
                                         )}

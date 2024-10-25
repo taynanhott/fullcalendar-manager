@@ -7,18 +7,16 @@ import {
 import TaskCard, { TaskListDialog, TaskTimeDialog } from "@/components/ui/task";
 import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import moment from "moment";
 
 export default function Timeline({
     className = "",
     date,
     day,
+    tasksInTimeline = {},
     selectedTasks,
-    setSelectedTasks,
-    multipleSelect,
-    checkedItems
+    setSelectedTasks
 }) {
-    const [tasksInTimeline, setTasksInTimeline] = useState([]);
+    const [tasksInTimeline, setTasksInTimeline] = useState([tasksInTimeline]);
 
     const dayDate = date.clone().date(day);
     const month = date.month();
@@ -29,29 +27,14 @@ export default function Timeline({
             id: uuidv4()
         }));
 
-        if (multipleSelect) {
-            const selectedDays = Object.keys(checkedItems).filter(day => checkedItems[day]);
-
-            selectedDays.forEach((selectedDay) => {
-                setTasksInTimeline(prevTasks => [
-                    ...prevTasks,
-                    ...tasksWithIds.map(task => ({
-                        ...task,
-                        day: selectedDay,
-                        date: moment(date).date(selectedDay)
-                    }))
-                ]);
-            });
-        } else {
-            setTasksInTimeline(prevTasks => [
-                ...prevTasks,
-                ...tasksWithIds.map(task => ({
-                    ...task,
-                    day,
-                    date: dayDate
-                }))
-            ]);
-        }
+        setTasksInTimeline(prevTasks => [
+            ...prevTasks,
+            ...tasksWithIds.map(task => ({
+                ...task,
+                day,
+                date: dayDate
+            }))
+        ]);
     };
 
     const handleRemoveTaskFromTimeline = (taskId) => {
