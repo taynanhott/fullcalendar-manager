@@ -4,6 +4,7 @@ import { DateSelectArg, EventApi } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { useState, useEffect, useRef } from 'react';
 import {
@@ -20,6 +21,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import RemoveEventDialog from '@/components/ui/remove';
 import moment from 'moment';
+import Sidebar from '@/components/ui/sidebar';
 
 let eventGuid = 0;
 
@@ -29,6 +31,8 @@ function createEventId() {
 type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 
 export default function Calendar() {
+  const repeatRef = useRef<HTMLInputElement>(null);
+  const calendarRef = useRef<FullCalendar>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
   const [dateClick, setDateClick] = useState<DateClickArg | null>(null);
@@ -42,17 +46,16 @@ export default function Calendar() {
   const [toolbarConfig, setToolbarConfig] = useState({
     left: 'prev,next',
     center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    right: ''
   });
-  const repeatRef = useRef<HTMLInputElement>(null);
 
   // Other functions ----------------------------------------------
   function formatDateTime(time: string) {
     return `T${time}-03:00`;
   }
 
-  const handleDateClick = (arg: DateClickArg) => {
-    setDateClick(arg);
+  const handleDateClick = (selectInfo: DateClickArg) => {
+    setDateClick(selectInfo);
     setIsSheetOpen(true);
   };
 
@@ -61,7 +64,7 @@ export default function Calendar() {
       setToolbarConfig({
         left: window.innerWidth > 768 ? 'prev,next today' : 'prev,next',
         center: 'title',
-        right: window.innerWidth > 768 ? 'dayGridMonth,timeGridWeek,timeGridDay' : 'dateRange'
+        right: ''
       });
       setSheetSide(window.innerWidth > 768 ? 'right' : 'bottom');
     }
@@ -135,124 +138,125 @@ export default function Calendar() {
     }
   };
 
+  const handleChangeView = () => {
+    if (calendarRef.current) {
+      calendarRef.current.getApi().changeView('listWeek');
+    }
+  };
+
   return (
-    <div className="p-4">
-
-      {/* ----------------------------- Calendar ----------------------------- */}
-      <FullCalendar
-        headerToolbar={toolbarConfig}
-        views={{
-          dayGridMonth: {
-            titleFormat: { month: 'short', year: 'numeric' }
-          }
-        }}
-        customButtons={{
-          dateRange: {
-            text: 'Range',
-            click: function () {
-              alert('clicked the custom button!');
+    <div>
+      <div className="p-4 mt-0 lg:mt-20">
+        {/* ----------------------------- Calendar ----------------------------- */}
+        <FullCalendar
+          ref={calendarRef}
+          headerToolbar={toolbarConfig}
+          views={{
+            dayGridMonth: {
+              titleFormat: { month: 'short', year: 'numeric' }
             }
-          }
-        }}
-        height={500}
-        dayMaxEvents={true}
-        dateClick={handleDateClick}
-        select={handleDateSelect}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        events={''}
-        editable={true}
-        selectable={true}
-        eventClick={handleEventClick}
-      />
+          }}
+          height={500}
+          dayMaxEvents={true}
+          dateClick={handleDateClick}
+          select={handleDateSelect}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+          initialView="dayGridMonth"
+          events={''}
+          editable={true}
+          selectable={true}
+          eventClick={handleEventClick}
+        />
 
-      {/* ----------------------------- Event Remove ----------------------------- */}
-      <RemoveEventDialog
-        eventName={eventToRemove ? eventToRemove.title : ""}
-        onConfirm={handleConfirmRemove}
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-      />
+        {/* ----------------------------- Event Remove ----------------------------- */}
+        <RemoveEventDialog
+          eventName={eventToRemove ? eventToRemove.title : ""}
+          onConfirm={handleConfirmRemove}
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+        />
 
-      {/* ----------------------------- Event Form ----------------------------- */}
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetTrigger asChild>
-          <Button className="block lg:hidden w-full mt-4 bg-[#2c3e50]" type="button">
-            Create a new event
-          </Button>
-        </SheetTrigger>
-        <SheetContent side={sheetSide}>
-          <SheetHeader>
-            <SheetTitle>New Event</SheetTitle>
-            <SheetDescription>
-              Enter the title for your event below.
-            </SheetDescription>
-            <form className="space-y-4" onSubmit={(e) => {
-              e.preventDefault();
-              const title = (document.querySelector('#title') as HTMLInputElement).value;
-              const start = formatDateTime(startTime);
-              const end = formatDateTime(endTime);
-              const repeats = repeatRef.current ? +repeatRef.current.value : 1;
+        {/* ----------------------------- Event Form ----------------------------- */}
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetTrigger asChild>
+            <Button className="block lg:hidden w-full mt-4 bg-[#2c3e50]" type="button">
+              Create a new event
+            </Button>
+          </SheetTrigger>
+          <SheetContent side={sheetSide}>
+            <SheetHeader>
+              <SheetTitle>New Event</SheetTitle>
+              <SheetDescription>
+                Enter the title for your event below.
+              </SheetDescription>
+              <form className="space-y-4" onSubmit={(e) => {
+                e.preventDefault();
+                const title = (document.querySelector('#title') as HTMLInputElement).value;
+                const start = formatDateTime(startTime);
+                const end = formatDateTime(endTime);
+                const repeats = repeatRef.current ? +repeatRef.current.value : 1;
 
-              handleEventCreate(title, isAllDay, start, end, repeats);
-            }}>
-              <div className="space-y-2 text-start">
-                <Label htmlFor="title">Event Title</Label>
-                <Input id="title" type="text" placeholder="Insert a event title" />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="all-day"
-                  checked={isAllDay}
-                  onCheckedChange={setIsAllDay}
-                />
-                <Label htmlFor="all-day">Event during all-day</Label>
-              </div>
-
-              {!isAllDay && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2 text-start">
-                    <Label htmlFor="start-time" className="">Select a start hour</Label>
-                    <Input id="start-time" type="time" onChange={(e) => setStartTime(e.target.value)} />
-                  </div>
-                  <div className="space-y-2 text-start">
-                    <Label htmlFor="end-time">Select an end-hour</Label>
-                    <Input id="end-time" type="time" onChange={(e) => setEndTime(e.target.value)} />
-                  </div>
+                handleEventCreate(title, isAllDay, start, end, repeats);
+              }}>
+                <div className="space-y-2 text-start">
+                  <Label htmlFor="title">Event Title</Label>
+                  <Input id="title" type="text" placeholder="Insert a event title" />
                 </div>
-              )}
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="repetitive"
-                  checked={isRepetitive}
-                  onCheckedChange={setIsRepetitive}
-                />
-                <Label htmlFor="repetitive">Repeat event</Label>
-              </div>
-
-              {isRepetitive && (
-                <div className="space-y-2">
-                  <Label htmlFor="repeat-count">Number repeats</Label>
-                  <Input
-                    id="repeat-count"
-                    type="number"
-                    min="1"
-                    placeholder="How much repeat this event?"
-                    defaultValue={1}
-                    ref={repeatRef}
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="all-day"
+                    checked={isAllDay}
+                    onCheckedChange={setIsAllDay}
                   />
+                  <Label htmlFor="all-day">Event during all-day</Label>
                 </div>
-              )}
 
-              <Button type="submit" className="w-full bg-[#2c3e50]">
-                Create a new event
-              </Button>
-            </form>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+                {!isAllDay && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2 text-start">
+                      <Label htmlFor="start-time" className="">Select a start hour</Label>
+                      <Input id="start-time" type="time" onChange={(e) => setStartTime(e.target.value)} />
+                    </div>
+                    <div className="space-y-2 text-start">
+                      <Label htmlFor="end-time">Select an end-hour</Label>
+                      <Input id="end-time" type="time" onChange={(e) => setEndTime(e.target.value)} />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="repetitive"
+                    checked={isRepetitive}
+                    onCheckedChange={setIsRepetitive}
+                  />
+                  <Label htmlFor="repetitive">Repeat event</Label>
+                </div>
+
+                {isRepetitive && (
+                  <div className="space-y-2">
+                    <Label htmlFor="repeat-count">Number repeats</Label>
+                    <Input
+                      id="repeat-count"
+                      type="number"
+                      min="1"
+                      placeholder="How much repeat this event?"
+                      defaultValue={1}
+                      ref={repeatRef}
+                    />
+                  </div>
+                )}
+
+                <Button type="submit" className="w-full bg-[#2c3e50]">
+                  Create a new event
+                </Button>
+              </form>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+      </div>
+      <Sidebar />
     </div>
   );
 }

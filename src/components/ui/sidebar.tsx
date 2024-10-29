@@ -28,6 +28,8 @@ export default function Sidebar({ className }: Props) {
               <Button variant="ghost" className="w-full justify-start" onClick={() => setOpen(false)}>
                 Item 1
               </Button>
+
+              <Button onClick={handleChangeView}>Gerenciar Lista</Button>
               <Button variant="ghost" className="w-full justify-start" onClick={() => setOpen(false)}>
                 Item 2
               </Button>
