@@ -1,10 +1,10 @@
 "use client";
 
-import { DateSelectArg } from '@fullcalendar/core';
+import { DateSelectArg, EventApi } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction';
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { useState, useEffect, useRef } from 'react';
 import {
   Sheet,
@@ -31,12 +31,12 @@ type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 export default function Calendar() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
-  const [dateClick, setDateClick] = useState(null);
+  const [dateClick, setDateClick] = useState<DateClickArg | null>(null);
   const [isAllDay, setIsAllDay] = useState(false);
   const [isRepetitive, setIsRepetitive] = useState(false);
   const [sheetSide, setSheetSide] = useState<SideOptions>('bottom');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [eventToRemove, setEventToRemove] = useState(null);
+  const [eventToRemove, setEventToRemove] = useState<EventApi | null>(null);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [toolbarConfig, setToolbarConfig] = useState({
@@ -47,7 +47,7 @@ export default function Calendar() {
   const repeatRef = useRef<HTMLInputElement>(null);
 
   // Other functions ----------------------------------------------
-  function formatDateTime(time) {
+  function formatDateTime(time: string) {
     return `T${time}-03:00`;
   }
 
@@ -80,7 +80,6 @@ export default function Calendar() {
     end: string,
     repeats: number
   ) => {
-
     if (window.innerWidth >= 1024) {
       if (selectedEventInfo) {
         const calendarApi = selectedEventInfo.view.calendar;
