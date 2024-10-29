@@ -1,10 +1,11 @@
 "use client";
 
-import FullCalendar, { DateSelectArg } from '@fullcalendar/react';
+import { DateSelectArg } from '@fullcalendar/core';
+import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction'; // Importando DateSelectArg aqui
-import { useState } from 'react';
+import interactionPlugin from '@fullcalendar/interaction';
+import { useState, useEffect, useRef } from 'react';
 import {
   Sheet,
   SheetTrigger,
@@ -17,98 +18,194 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-
-interface DateRange {
-  start: string;
-  end: string;
-}
+import RemoveEventDialog from '@/components/ui/remove';
+import moment from 'moment';
 
 let eventGuid = 0;
 
 function createEventId() {
   return String(eventGuid++);
 }
+type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 
 export default function Calendar() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
-  const [isAllDay, setIsAllDay] = useState(false)
-  const [isRepetitive, setIsRepetitive] = useState(false)
+  const [dateClick, setDateClick] = useState(null);
+  const [isAllDay, setIsAllDay] = useState(false);
+  const [isRepetitive, setIsRepetitive] = useState(false);
+  const [sheetSide, setSheetSide] = useState<SideOptions>('bottom');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [eventToRemove, setEventToRemove] = useState(null);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [toolbarConfig, setToolbarConfig] = useState({
+    left: 'prev,next',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+  });
+  const repeatRef = useRef<HTMLInputElement>(null);
+
+  // Other functions ----------------------------------------------
+  function formatDateTime(time) {
+    return `T${time}-03:00`;
+  }
 
   const handleDateClick = (arg: any) => {
-    console.log(arg.dateStr);
+    setDateClick(arg);
+    setIsSheetOpen(true);
   };
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToolbarConfig({
+        left: window.innerWidth > 768 ? 'prev,next today' : 'prev,next',
+        center: 'title',
+        right: window.innerWidth > 768 ? 'dayGridMonth,timeGridWeek,timeGridDay' : 'dateRange'
+      });
+      setSheetSide(window.innerWidth > 768 ? 'right' : 'bottom');
+    }
+  }, []);
+
+  // Event add functions ----------------------------------------------
   const handleDateSelect = (selectInfo: any) => {
     setSelectedEventInfo(selectInfo);
     setIsSheetOpen(true);
   };
 
-  const handleEventCreate = (title: string) => {
-    if (selectedEventInfo) {
-      const calendarApi = selectedEventInfo.view.calendar;
+  const handleEventCreate = (
+    title: string,
+    allDay: boolean,
+    start: string,
+    end: string,
+    repeats: number
+  ) => {
 
-      calendarApi.unselect();
-
-      if (title) {
-        calendarApi.addEvent({
-          id: createEventId(),
-          title,
-          start: selectedEventInfo.startStr,
-          end: selectedEventInfo.endStr,
-          allDay: selectedEventInfo.allDay
-        });
+    if (window.innerWidth >= 1024) {
+      if (selectedEventInfo) {
+        const calendarApi = selectedEventInfo.view.calendar;
+        console.log(moment(selectedEventInfo.start).format('YYYY-MM-DD') + start)
+        calendarApi.unselect();
+        if (title) {
+          let count = 0;
+          while (count < repeats) {
+            calendarApi.addEvent({
+              id: createEventId(),
+              title,
+              start: allDay ? selectedEventInfo.start : moment(selectedEventInfo.start).format('YYYY-MM-DD') + start,
+              end: allDay ? selectedEventInfo.end : moment(selectedEventInfo.start).format('YYYY-MM-DD') + end,
+              allDay,
+            });
+            count++;
+          }
+          setIsSheetOpen(false);
+        }
       }
-      setIsSheetOpen(false);
+    } else {
+      if (dateClick) {
+        const calendarApi = dateClick.view.calendar;
+        calendarApi.unselect();
+        if (title) {
+          let count = 0;
+          while (count < repeats) {
+            calendarApi.addEvent({
+              id: createEventId(),
+              title,
+              start: allDay ? dateClick.date : moment(dateClick.date).format('YYYY-MM-DD') + start,
+              end: allDay ? dateClick.date : moment(dateClick.date).format('YYYY-MM-DD') + end,
+              allDay,
+            });
+            count++;
+          }
+          setIsSheetOpen(false);
+        }
+      }
     }
   };
 
+  // Event remove functions ----------------------------------------------
   function handleEventClick(clickInfo: any) {
-    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-      clickInfo.event.remove()
-    }
+    setEventToRemove(clickInfo.event);
+    setIsDialogOpen(true);
   }
+
+  const handleConfirmRemove = async () => {
+    if (eventToRemove) {
+      eventToRemove.remove();
+      setEventToRemove(null);
+      setIsDialogOpen(false);
+    }
+  };
 
   return (
     <div className="p-4">
+
+      {/* ----------------------------- Calendar ----------------------------- */}
       <FullCalendar
-        headerToolbar={{
-          left: window.innerWidth > 768 ? 'prev,next today' : 'prev,next',
-          center: window.innerWidth > 768 ? 'title' : '',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        }}
+        headerToolbar={toolbarConfig}
+        views={
+          {
+            dayGridMonth: {
+              titleFormat: { month: 'short', year: 'numeric' }
+            }
+          }
+        }
+        customButtons={
+          {
+            dateRange: {
+              text: 'Range',
+              click: function () {
+                alert('clicked the custom button!');
+              }
+            }
+          }
+        }
         height={500}
         dayMaxEvents={true}
         dateClick={handleDateClick}
         select={handleDateSelect}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
-        events={'https://fullcalendar.io/api/demo-feeds/events.json'}
+        events={''}
         editable={true}
         selectable={true}
         eventClick={handleEventClick}
       />
+
+      {/* ----------------------------- Event Remove ----------------------------- */}
+      <RemoveEventDialog
+        eventName={eventToRemove ? eventToRemove.title : ""}
+        onConfirm={handleConfirmRemove}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
+
+      {/* ----------------------------- Event Form ----------------------------- */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetTrigger asChild>
-          <Button className="block lg:hidden w-full mt-4" type="button" variant="outline">
+          <Button className="block lg:hidden w-full mt-4 bg-[#2c3e50]" type="button">
             Create a new event
           </Button>
         </SheetTrigger>
-        <SheetContent side={window.innerWidth > 768 ? 'right' : 'bottom'}>
+        <SheetContent side={sheetSide}>
           <SheetHeader>
-            <SheetTitle>Create a new event</SheetTitle>
+            <SheetTitle>New Event</SheetTitle>
             <SheetDescription>
               Enter the title for your event below.
             </SheetDescription>
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Título do Evento</Label>
-                <Input type="text"
-                  placeholder="Event title"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleEventCreate((e.target as HTMLInputElement).value);
-                  }}
-                />
+            <form className="space-y-4" onSubmit={(e) => {
+              e.preventDefault();
+              const title = (document.querySelector('#title') as HTMLInputElement).value;
+              const start = formatDateTime(startTime);
+              const end = formatDateTime(endTime);
+              const repeats = repeatRef.current ? +repeatRef.current.value : 1;
+
+
+              handleEventCreate(title, isAllDay, start, end, repeats);
+            }}>
+              <div className="space-y-2 text-start">
+                <Label htmlFor="title">Event Title</Label>
+                <Input id="title" type="text" placeholder="Insert a event title" />
               </div>
 
               <div className="flex items-center space-x-2">
@@ -117,18 +214,18 @@ export default function Calendar() {
                   checked={isAllDay}
                   onCheckedChange={setIsAllDay}
                 />
-                <Label htmlFor="all-day">Evento de dia inteiro</Label>
+                <Label htmlFor="all-day">Event during all-day</Label>
               </div>
 
               {!isAllDay && (
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="start-time">Horário de Início</Label>
-                    <Input id="start-time" type="time" />
+                  <div className="space-y-2 text-start">
+                    <Label htmlFor="start-time" className="">Select a start hour</Label>
+                    <Input id="start-time" type="time" onChange={(e) => setStartTime(e.target.value)} />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="end-time">Horário de Fim</Label>
-                    <Input id="end-time" type="time" />
+                  <div className="space-y-2 text-start">
+                    <Label htmlFor="end-time">Select an end-hour</Label>
+                    <Input id="end-time" type="time" onChange={(e) => setEndTime(e.target.value)} />
                   </div>
                 </div>
               )}
@@ -139,23 +236,25 @@ export default function Calendar() {
                   checked={isRepetitive}
                   onCheckedChange={setIsRepetitive}
                 />
-                <Label htmlFor="repetitive">Evento repetitivo</Label>
+                <Label htmlFor="repetitive">Repeat event</Label>
               </div>
 
               {isRepetitive && (
                 <div className="space-y-2">
-                  <Label htmlFor="repeat-count">Número de repetições</Label>
+                  <Label htmlFor="repeat-count">Number repeats</Label>
                   <Input
                     id="repeat-count"
                     type="number"
                     min="1"
-                    placeholder="Quantas vezes o evento irá se repetir?"
+                    placeholder="How much repeat this event?"
+                    defaultValue={1}
+                    ref={repeatRef}
                   />
                 </div>
               )}
 
-              <Button type="button" className="w-full" variant="outline" onClick={() => handleEventCreate((document.querySelector('input') as HTMLInputElement).value)}>
-                Criar Evento
+              <Button type="submit" className="w-full bg-[#2c3e50]">
+                Create a new event
               </Button>
             </form>
           </SheetHeader>

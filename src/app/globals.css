@@ -6,7 +6,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-body > div { /* the react root */
+body>div {
+  /* the react root */
   margin: 0;
   padding: 0;
   height: 100%;
@@ -27,7 +28,8 @@ li {
   padding: 0;
 }
 
-b { /* used for event dates/times */
+b {
+  /* used for event dates/times */
   margin-right: 3px;
 }
 
@@ -54,7 +56,12 @@ b { /* used for event dates/times */
   padding: 3em;
 }
 
-.fc { /* the calendar root */
+td .fc-day:hover {
+  background-color: rgb(247, 233, 228) !important;
+  cursor: pointer;
+}
+
+.fc {
   max-width: 1100px;
   margin: 0 auto;
 }
@@ -87,6 +94,7 @@ b { /* used for event dates/times */
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -119,6 +127,7 @@ b { /* used for event dates/times */
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
