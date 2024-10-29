@@ -3,7 +3,7 @@
 import { DateSelectArg, EventApi } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid'
+import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { useState, useEffect, useRef } from 'react';
 import {
@@ -51,7 +51,7 @@ export default function Calendar() {
     return `T${time}-03:00`;
   }
 
-  const handleDateClick = (arg: any) => {
+  const handleDateClick = (arg: DateClickArg) => {
     setDateClick(arg);
     setIsSheetOpen(true);
   };
@@ -68,7 +68,7 @@ export default function Calendar() {
   }, []);
 
   // Event add functions ----------------------------------------------
-  const handleDateSelect = (selectInfo: any) => {
+  const handleDateSelect = (selectInfo: DateSelectArg) => {
     setSelectedEventInfo(selectInfo);
     setIsSheetOpen(true);
   };
@@ -83,7 +83,6 @@ export default function Calendar() {
     if (window.innerWidth >= 1024) {
       if (selectedEventInfo) {
         const calendarApi = selectedEventInfo.view.calendar;
-        console.log(moment(selectedEventInfo.start).format('YYYY-MM-DD') + start)
         calendarApi.unselect();
         if (title) {
           let count = 0;
@@ -123,7 +122,7 @@ export default function Calendar() {
   };
 
   // Event remove functions ----------------------------------------------
-  function handleEventClick(clickInfo: any) {
+  function handleEventClick(clickInfo: { event: EventApi }) {
     setEventToRemove(clickInfo.event);
     setIsDialogOpen(true);
   }
@@ -142,23 +141,19 @@ export default function Calendar() {
       {/* ----------------------------- Calendar ----------------------------- */}
       <FullCalendar
         headerToolbar={toolbarConfig}
-        views={
-          {
-            dayGridMonth: {
-              titleFormat: { month: 'short', year: 'numeric' }
+        views={{
+          dayGridMonth: {
+            titleFormat: { month: 'short', year: 'numeric' }
+          }
+        }}
+        customButtons={{
+          dateRange: {
+            text: 'Range',
+            click: function () {
+              alert('clicked the custom button!');
             }
           }
-        }
-        customButtons={
-          {
-            dateRange: {
-              text: 'Range',
-              click: function () {
-                alert('clicked the custom button!');
-              }
-            }
-          }
-        }
+        }}
         height={500}
         dayMaxEvents={true}
         dateClick={handleDateClick}
@@ -198,7 +193,6 @@ export default function Calendar() {
               const start = formatDateTime(startTime);
               const end = formatDateTime(endTime);
               const repeats = repeatRef.current ? +repeatRef.current.value : 1;
-
 
               handleEventCreate(title, isAllDay, start, end, repeats);
             }}>

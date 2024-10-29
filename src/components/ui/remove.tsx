@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,8 +14,8 @@ import {
 interface RemoveEventDialogProps {
     eventName: string;
     onConfirm: () => Promise<void>;
-    isOpen: boolean; // Adicione esta propriedade
-    onClose: () => void; // Adicione esta propriedade
+    isOpen: boolean;
+    onClose: () => void;
 }
 
 export default function RemoveEventDialog({ eventName, onConfirm, isOpen, onClose }: RemoveEventDialogProps) {
@@ -28,7 +28,7 @@ export default function RemoveEventDialog({ eventName, onConfirm, isOpen, onClos
                 <DialogHeader>
                     <DialogTitle>Remove Event</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to remove the event "{eventName}"? This action cannot be undone.
+                        Are you sure you want to remove the event &quot;{eventName}&quot;? This action cannot be undone.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
