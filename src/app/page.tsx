@@ -31,20 +31,16 @@ type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 
 export default function Calendar() {
   const calendarRef = useRef<FullCalendar>(null);
+  const [hidden, setHidden] = useState(true);
+  const [isDateSelectActive, setIsDateSelectActive] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
-  const [dateClick, setDateClick] = useState<DateClickArg | null>(null);
   const [sheetSide, setSheetSide] = useState<SideOptions>('bottom');
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
   const [toolbarConfig, setToolbarConfig] = useState({ left: 'prev,next', center: 'title', right: '' });
 
   // Other functions ----------------------------------------------
-  const handleDateClick = (selectInfo: DateClickArg) => {
-    setDateClick(selectInfo);
-    setIsSheetOpen(true);
-  };
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const small = window.innerWidth < 768;
@@ -57,36 +53,51 @@ export default function Calendar() {
     }
   }, []);
 
+  const handleDateClick = (selectInfo: DateClickArg) => {
+    if (!isDateSelectActive) {
+      if (calendarRef.current) {
+        calendarRef.current.getApi().changeView('dayGridDay', selectInfo.dateStr);
+        setHidden(false);
+      }
+    }
+  };
+
   // Event add functions ----------------------------------------------
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     setSelectedEventInfo(selectInfo);
     setIsSheetOpen(true);
+    setIsDateSelectActive(true);
+
+    if (calendarRef.current) {
+      calendarRef.current.getApi().changeView('dayGridMonth', selectInfo.startStr);
+    }
+
+    setTimeout(() => {
+      setIsDateSelectActive(false);
+    }, 300);
   };
 
-  // Create -------------------------------------
+  // Create -----------------------------------------------------------
   const handleEventCreate = (title: string, start: string, end: string, allDay: boolean, repeats: number) => {
-    if (typeof window !== 'undefined') {
-      const large = window.innerWidth >= 1024;
-      const calendarApi = large ? selectedEventInfo?.view.calendar : dateClick?.view.calendar;
-      const eventStart = large ? selectedEventInfo?.start : dateClick?.date;
-      const eventEnd = large ? selectedEventInfo?.end : dateClick?.date;
+    const calendarApi = selectedEventInfo?.view.calendar;
+    const eventStart = selectedEventInfo?.start;
+    const eventEnd = selectedEventInfo?.end;
 
-      if (calendarApi && eventStart) {
-        calendarApi.unselect();
+    if (calendarApi && eventStart) {
+      calendarApi.unselect();
 
-        let count = 0;
-        while (count < repeats) {
-          calendarApi.addEvent({
-            id: createEventId(),
-            title,
-            start: allDay ? eventStart : moment(eventStart).format('YYYY-MM-DD') + start,
-            end: allDay ? eventEnd : moment(eventStart).format('YYYY-MM-DD') + end,
-            allDay,
-          });
-          count++;
-        }
-        setIsSheetOpen(false);
+      let count = 0;
+      while (count < repeats) {
+        calendarApi.addEvent({
+          id: createEventId(),
+          title,
+          start: allDay ? eventStart : moment(eventStart).format('YYYY-MM-DD') + start,
+          end: allDay ? eventEnd : moment(eventStart).format('YYYY-MM-DD') + end,
+          allDay,
+        });
+        count++;
       }
+      setIsSheetOpen(false);
     }
   };
 
@@ -107,6 +118,7 @@ export default function Calendar() {
   const handleChangeView = (view: 'listWeek' | 'dayGridWeek' | 'dayGridMonth') => {
     if (calendarRef.current) {
       calendarRef.current.getApi().changeView(view);
+      setHidden(true);
     }
   };
 
@@ -148,7 +160,7 @@ export default function Calendar() {
         {/* ----------------------------- Event Form ----------------------------- */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
-            <Button className="hidden w-full mt-4 bg-[#2c3e50]" type="button">
+            <Button className={`${hidden ? 'hidden' : ''} w-full mt-4 bg-[#2c3e50]`} type="button">
               Create a new event
             </Button>
           </SheetTrigger>
