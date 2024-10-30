@@ -15,46 +15,31 @@ import {
   SheetTitle,
   SheetDescription
 } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import RemoveEventDialog from '@/components/ui/remove';
+import ManageEventDialog from '@/components/ui/manage';
 import moment from 'moment';
 import Sidebar from '@/components/ui/sidebar';
+import FormEvent from '@/components/ui/formEvent';
 
-let eventGuid = 0;
+let eventGuid = 1;
 
 function createEventId() {
   return String(eventGuid++);
 }
+
 type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 
 export default function Calendar() {
-  const repeatRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<FullCalendar>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  // const [hidden, setHidden] = useState(false);
   const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
   const [dateClick, setDateClick] = useState<DateClickArg | null>(null);
-  const [isAllDay, setIsAllDay] = useState(false);
-  const [isRepetitive, setIsRepetitive] = useState(false);
   const [sheetSide, setSheetSide] = useState<SideOptions>('bottom');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [eventToRemove, setEventToRemove] = useState<EventApi | null>(null);
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [toolbarConfig, setToolbarConfig] = useState({
-    left: 'prev,next',
-    center: 'title',
-    right: ''
-  });
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
+  const [toolbarConfig, setToolbarConfig] = useState({ left: 'prev,next', center: 'title', right: '' });
 
   // Other functions ----------------------------------------------
-  function formatDateTime(time: string) {
-    return `T${time}-03:00`;
-  }
-
   const handleDateClick = (selectInfo: DateClickArg) => {
     setDateClick(selectInfo);
     setIsSheetOpen(true);
@@ -62,12 +47,13 @@ export default function Calendar() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const small = window.innerWidth < 768;
       setToolbarConfig({
-        left: window.innerWidth > 768 ? 'prev,next today' : 'prev,next',
+        left: small ? 'prev,next' : 'prev,next today',
         center: 'title',
         right: ''
       });
-      setSheetSide(window.innerWidth > 768 ? 'right' : 'bottom');
+      setSheetSide(small ? 'bottom' : 'right');
     }
   }, []);
 
@@ -77,70 +63,48 @@ export default function Calendar() {
     setIsSheetOpen(true);
   };
 
-  const handleEventCreate = (
-    title: string,
-    allDay: boolean,
-    start: string,
-    end: string,
-    repeats: number
-  ) => {
-    if (window.innerWidth >= 1024) {
-      if (selectedEventInfo) {
-        const calendarApi = selectedEventInfo.view.calendar;
+  // Create -------------------------------------
+  const handleEventCreate = (title: string, start: string, end: string, allDay: boolean, repeats: number) => {
+    if (typeof window !== 'undefined') {
+      const large = window.innerWidth >= 1024;
+      const calendarApi = large ? selectedEventInfo?.view.calendar : dateClick?.view.calendar;
+      const eventStart = large ? selectedEventInfo?.start : dateClick?.date;
+      const eventEnd = large ? selectedEventInfo?.end : dateClick?.date;
+
+      if (calendarApi && eventStart) {
         calendarApi.unselect();
-        if (title) {
-          let count = 0;
-          while (count < repeats) {
-            calendarApi.addEvent({
-              id: createEventId(),
-              title,
-              start: allDay ? selectedEventInfo.start : moment(selectedEventInfo.start).format('YYYY-MM-DD') + start,
-              end: allDay ? selectedEventInfo.end : moment(selectedEventInfo.start).format('YYYY-MM-DD') + end,
-              allDay,
-            });
-            count++;
-          }
-          setIsSheetOpen(false);
+
+        let count = 0;
+        while (count < repeats) {
+          calendarApi.addEvent({
+            id: createEventId(),
+            title,
+            start: allDay ? eventStart : moment(eventStart).format('YYYY-MM-DD') + start,
+            end: allDay ? eventEnd : moment(eventStart).format('YYYY-MM-DD') + end,
+            allDay,
+          });
+          count++;
         }
-      }
-    } else {
-      if (dateClick) {
-        const calendarApi = dateClick.view.calendar;
-        calendarApi.unselect();
-        if (title) {
-          let count = 0;
-          while (count < repeats) {
-            calendarApi.addEvent({
-              id: createEventId(),
-              title,
-              start: allDay ? dateClick.date : moment(dateClick.date).format('YYYY-MM-DD') + start,
-              end: allDay ? dateClick.date : moment(dateClick.date).format('YYYY-MM-DD') + end,
-              allDay,
-            });
-            count++;
-          }
-          setIsSheetOpen(false);
-        }
+        setIsSheetOpen(false);
       }
     }
   };
 
   // Event remove functions ----------------------------------------------
   function handleEventClick(clickInfo: { event: EventApi }) {
-    setEventToRemove(clickInfo.event);
-    setIsDialogOpen(true);
+    setEventToManage(clickInfo.event);
+    setIsEditOpen(true);
   }
 
   const handleConfirmRemove = async () => {
-    if (eventToRemove) {
-      eventToRemove.remove();
-      setEventToRemove(null);
-      setIsDialogOpen(false);
+    if (eventToManage) {
+      eventToManage.remove();
+      setEventToManage(null);
+      setIsEditOpen(false);
     }
   };
 
   const handleChangeView = (view: 'listWeek' | 'dayGridWeek' | 'dayGridMonth') => {
-    // view === "listWeek" ? setHidden(true) : setHidden(false);
     if (calendarRef.current) {
       calendarRef.current.getApi().changeView(view);
     }
@@ -164,24 +128,26 @@ export default function Calendar() {
           select={handleDateSelect}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           initialView="dayGridMonth"
-          events={''}
+          events={'https://fullcalendar.io/api/demo-feeds/events.json'}
           editable={true}
           selectable={true}
           eventClick={handleEventClick}
         />
 
         {/* ----------------------------- Event Remove ----------------------------- */}
-        <RemoveEventDialog
-          eventName={eventToRemove ? eventToRemove.title : ""}
+        <ManageEventDialog
+          id={eventToManage ? +eventToManage.id : 0}
+          eventName={eventToManage ? eventToManage.title : ""}
           onConfirm={handleConfirmRemove}
-          isOpen={isDialogOpen}
-          onClose={() => setIsDialogOpen(false)}
+          isSheetOpen={isEditOpen}
+          sheetSide={sheetSide}
+          setIsSheetOpen={setIsEditOpen}  // Passe diretamente, sem função
+          handleEventCreate={handleEventCreate}
         />
 
         {/* ----------------------------- Event Form ----------------------------- */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
-            {/*<Button className={`block ${hidden && 'hidden'} lg:hidden w-full mt-4 bg-[#2c3e50]`} type="button">*/}
             <Button className="hidden w-full mt-4 bg-[#2c3e50]" type="button">
               Create a new event
             </Button>
@@ -192,69 +158,7 @@ export default function Calendar() {
               <SheetDescription>
                 Enter the title for your event below.
               </SheetDescription>
-              <form className="space-y-4" onSubmit={(e) => {
-                e.preventDefault();
-                const title = (document.querySelector('#title') as HTMLInputElement).value;
-                const start = formatDateTime(startTime);
-                const end = formatDateTime(endTime);
-                const repeats = repeatRef.current ? +repeatRef.current.value : 1;
-
-                handleEventCreate(title, isAllDay, start, end, repeats);
-              }}>
-                <div className="space-y-2 text-start">
-                  <Label htmlFor="title">Event Title</Label>
-                  <Input id="title" type="text" placeholder="Insert a event title" />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="all-day"
-                    checked={isAllDay}
-                    onCheckedChange={setIsAllDay}
-                  />
-                  <Label htmlFor="all-day">Event during all-day</Label>
-                </div>
-
-                {!isAllDay && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2 text-start">
-                      <Label htmlFor="start-time" className="">Select a start hour</Label>
-                      <Input id="start-time" type="time" onChange={(e) => setStartTime(e.target.value)} />
-                    </div>
-                    <div className="space-y-2 text-start">
-                      <Label htmlFor="end-time">Select an end-hour</Label>
-                      <Input id="end-time" type="time" onChange={(e) => setEndTime(e.target.value)} />
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="repetitive"
-                    checked={isRepetitive}
-                    onCheckedChange={setIsRepetitive}
-                  />
-                  <Label htmlFor="repetitive">Repeat event</Label>
-                </div>
-
-                {isRepetitive && (
-                  <div className="space-y-2">
-                    <Label htmlFor="repeat-count">Number repeats</Label>
-                    <Input
-                      id="repeat-count"
-                      type="number"
-                      min="1"
-                      placeholder="How much repeat this event?"
-                      defaultValue={1}
-                      ref={repeatRef}
-                    />
-                  </div>
-                )}
-
-                <Button type="submit" className="w-full bg-[#2c3e50]">
-                  Create a new event
-                </Button>
-              </form>
+              <FormEvent handleEventCreate={handleEventCreate} id={0} />
             </SheetHeader>
           </SheetContent>
         </Sheet>
