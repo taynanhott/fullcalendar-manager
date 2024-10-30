@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 
 interface Props {
-  className?: string
+  className?: string,
+  handleChangeView: (view: "listWeek" | "dayGridWeek" | "dayGridMonth") => void
 }
 
-export default function Sidebar({ className }: Props) {
+export default function Sidebar({ className, handleChangeView }: Props) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -23,23 +24,15 @@ export default function Sidebar({ className }: Props) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-4 py-4 text-left">
               <h2 className="text-lg font-semibold">Menu</h2>
-              <Button variant="ghost" className="w-full justify-start" onClick={() => setOpen(false)}>
-                Item 1
-              </Button>
-
-              <Button onClick={handleChangeView}>Gerenciar Lista</Button>
-              <Button variant="ghost" className="w-full justify-start" onClick={() => setOpen(false)}>
-                Item 2
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" onClick={() => setOpen(false)}>
-                Item 3
-              </Button>
+              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek'); setOpen(false); }}>Manage Week</Button>
+              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridMonth'); setOpen(false); }}>Manage Month</Button>
+              <Button variant="ghost" onClick={async () => { handleChangeView('listWeek'); setOpen(false); }}>Manage List</Button>
             </div>
           </SheetContent>
         </Sheet>
-        <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden">
+        <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden" onClick={() => handleChangeView('dayGridMonth')}>
           <Home className="h-6 w-6" />
         </Button>
         <Button variant="ghost" size="icon" aria-label="User">

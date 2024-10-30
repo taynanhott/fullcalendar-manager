@@ -34,6 +34,7 @@ export default function Calendar() {
   const repeatRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<FullCalendar>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  // const [hidden, setHidden] = useState(false);
   const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
   const [dateClick, setDateClick] = useState<DateClickArg | null>(null);
   const [isAllDay, setIsAllDay] = useState(false);
@@ -138,9 +139,10 @@ export default function Calendar() {
     }
   };
 
-  const handleChangeView = () => {
+  const handleChangeView = (view: 'listWeek' | 'dayGridWeek' | 'dayGridMonth') => {
+    // view === "listWeek" ? setHidden(true) : setHidden(false);
     if (calendarRef.current) {
-      calendarRef.current.getApi().changeView('listWeek');
+      calendarRef.current.getApi().changeView(view);
     }
   };
 
@@ -179,7 +181,8 @@ export default function Calendar() {
         {/* ----------------------------- Event Form ----------------------------- */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
-            <Button className="block lg:hidden w-full mt-4 bg-[#2c3e50]" type="button">
+            {/*<Button className={`block ${hidden && 'hidden'} lg:hidden w-full mt-4 bg-[#2c3e50]`} type="button">*/}
+            <Button className="hidden w-full mt-4 bg-[#2c3e50]" type="button">
               Create a new event
             </Button>
           </SheetTrigger>
@@ -256,7 +259,7 @@ export default function Calendar() {
           </SheetContent>
         </Sheet>
       </div>
-      <Sidebar />
-    </div>
+      <Sidebar handleChangeView={handleChangeView} />
+    </div >
   );
 }
