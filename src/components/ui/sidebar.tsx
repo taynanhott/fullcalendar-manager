@@ -1,10 +1,17 @@
 'use client'
 
 import * as React from 'react'
-import { Home, Menu, User } from 'lucide-react'
+import { Home, Menu } from 'lucide-react'
 
+import Link from "next/link";
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Icon } from './icon'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface Props {
   className?: string,
@@ -35,9 +42,24 @@ export default function Sidebar({ className, handleChangeView }: Props) {
         <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden" onClick={() => handleChangeView('dayGridMonth')}>
           <Home className="h-6 w-6" />
         </Button>
-        <Button variant="ghost" size="icon" aria-label="User">
-          <User className="h-6 w-6" />
-        </Button>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" aria-label="User">
+              <Icon />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-24 mr-4">
+            <Button className="w-full" variant="ghost" size="icon" aria-label="User">
+              <Link
+                href="/api/logout"
+                prefetch={false}
+              >
+                Log out
+              </Link>
+            </Button>
+          </PopoverContent>
+        </Popover>
       </nav>
     </div>
   )
