@@ -23,6 +23,13 @@ import FormEvent from '@/components/ui/formEvent';
 
 let eventGuid = 1;
 
+let small = false;
+let height = 650;
+if (typeof window !== 'undefined') {
+  small = window.innerWidth < 768;
+  height = window.innerHeight >= 740 ? 650 : 500;
+}
+
 function createEventId() {
   return String(eventGuid++);
 }
@@ -41,15 +48,12 @@ export default function Calendar() {
 
   // Other functions =======================================================================
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const small = window.innerWidth < 768;
-      setToolbarConfig({
-        left: small ? 'prev,next' : 'prev,next today',
-        center: 'title',
-        right: ''
-      });
-      setSheetSide(small ? 'bottom' : 'right');
-    }
+    setToolbarConfig({
+      left: small ? 'prev,next' : 'prev,next today',
+      center: 'title',
+      right: ''
+    });
+    setSheetSide(small ? 'bottom' : 'right');
   }, []);
 
   const handleDateClick = (selectInfo: DateClickArg) => {
@@ -66,7 +70,7 @@ export default function Calendar() {
     setIsSheetOpen(true);
     setIsDateSelectActive(true);
 
-    if (calendarRef.current) {
+    if (calendarRef.current && small) {
       calendarRef.current.getApi().changeView('dayGridMonth', selectInfo.startStr);
     }
 
@@ -76,24 +80,23 @@ export default function Calendar() {
   };
 
   // Create -----------------------------------------------------------
-  const handleEventCreate = (title: string, start: string, end: string, allDay: boolean, repeats: number, color: string) => {
+  const handleEventCreate = (title: string, start: string, end: string, allDay: boolean, color: string) => {
     const calendarApi = selectedEventInfo?.view.calendar;
     const eventStart = selectedEventInfo?.start;
     const eventEnd = selectedEventInfo?.end;
 
-    if (calendarApi && eventStart) {
+    if (calendarApi && eventStart && eventEnd) {
       calendarApi.unselect();
 
       let count = 0;
-      console.log(eventStart)
-      console.log(`${start}`)
-      console.log(`${end}`)
+      const repeats = allDay ? 1 : moment(eventEnd).diff(moment(eventStart), 'days');
+
       while (count < repeats) {
         calendarApi.addEvent({
           id: createEventId(),
           title,
-          start: allDay ? eventStart : moment(eventStart).format('YYYY-MM-DD') + start,
-          end: allDay ? eventEnd : moment(eventStart).format('YYYY-MM-DD') + end,
+          start: allDay ? eventStart : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start,
+          end: allDay ? eventEnd : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end,
           allDay,
           backgroundColor: color,
           borderColor: color
@@ -114,7 +117,6 @@ export default function Calendar() {
       const formattedEnd = moment(event.start).format("YYYY-MM-DD") + end;
 
       event.setProp("title", title);
-      console.log(allDay)
       event.setAllDay(allDay);
       event.setProp("backgroundColor", color);
       event.setProp("borderColor", color);
@@ -161,13 +163,13 @@ export default function Calendar() {
               titleFormat: { month: 'short', year: 'numeric' }
             }
           }}
-          height={500}
+          height={height}
           dayMaxEvents={true}
           dateClick={handleDateClick}
           select={handleDateSelect}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           initialView="dayGridMonth"
-          events={'https://fullcalendar.io/api/demo-feeds/events.json'}
+          // events={'https://fullcalendar.io/api/demo-feeds/events.json'}
           editable={true}
           selectable={true}
           eventClick={handleEventClick}

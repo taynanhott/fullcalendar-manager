@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "./input";
 import { Label } from "./label";
 import { Switch } from "./switch";
@@ -9,14 +9,12 @@ import ColorSelector from "./color";
 
 interface Props {
     event?: EventApi | null;
-    handleEventCreate?: (title: string, start: string, end: string, allDay: boolean, repeats: number, color: string) => void;
+    handleEventCreate?: (title: string, start: string, end: string, allDay: boolean, color: string) => void;
     handleEventEdit?: (id: string, title: string, start: string, end: string, allDay: boolean, color: string) => void;
 }
 
 export default function FormEvent({ handleEventCreate, handleEventEdit, event }: Props) {
-    const repeatRef = useRef<HTMLInputElement>(null);
     const [isAllDay, setIsAllDay] = useState(false);
-    const [isRepetitive, setIsRepetitive] = useState(false);
     const [title, setTitle] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
@@ -51,7 +49,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
         }, 3000);
     };
 
-    const validateForm = (title: string, start: string, end: string, allDay: boolean, repeats: number, color: string) => {
+    const validateForm = (title: string, start: string, end: string, allDay: boolean, color: string) => {
         if (!title || title.trim() === '') {
             showWarning();
             return false;
@@ -67,11 +65,11 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
                 return false;
             }
         }
-        
+
         if (event && handleEventEdit) {
             handleEventEdit(event.id, title, start, end, allDay, color);
         } else if (handleEventCreate) {
-            handleEventCreate(title, start, end, allDay, repeats, color);
+            handleEventCreate(title, start, end, allDay, color);
         }
     };
 
@@ -81,9 +79,8 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
                 e.preventDefault();
                 const start = formatDateTime(startTime);
                 const end = formatDateTime(endTime);
-                const repeats = repeatRef.current ? +repeatRef.current.value : 1;
 
-                validateForm(title, start, end, isAllDay, repeats, color);
+                validateForm(title, start, end, isAllDay, color);
             }}>
                 <div className="space-y-2 text-start">
                     <Label htmlFor="title">Event Title</Label>
@@ -128,29 +125,6 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
                     </div>
                 )}
 
-                {!event && (<div className="flex items-center space-x-2">
-                    <Switch
-                        id="repetitive"
-                        checked={isRepetitive}
-                        onCheckedChange={setIsRepetitive}
-                    />
-                    <Label htmlFor="repetitive">Repeat event</Label>
-                </div>)}
-
-                {isRepetitive && (
-                    <div className="space-y-2">
-                        <Label htmlFor="repeat-count">Number of repeats</Label>
-                        <Input
-                            id="repeat-count"
-                            type="number"
-                            min="1"
-                            placeholder="How many times to repeat this event?"
-                            defaultValue={1}
-                            ref={repeatRef}
-                        />
-                    </div>
-                )}
-
                 <div className="flex items-center space-x-2">
                     <Label htmlFor="repeat-count">Select an color</Label>
                     <ColorSelector
@@ -162,7 +136,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
                 <Button type="submit" className="w-full bg-[#2c3e50]">
                     {event ? "Update the event" : "Create a new event"}
                 </Button>
-            </form>
+            </form >
             <Alert isOpen={isOpen} setIsOpen={setIsOpen} />
         </>
     );
