@@ -9,20 +9,20 @@ import {
     SheetDescription
 } from '@/components/ui/sheet';
 import FormEvent from "./formEvent";
+import { EventApi } from "fullcalendar/index.js";
 
 type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 
 interface RemoveEventDialogProps {
-    id: number;
-    eventName: string;
+    event: EventApi | null
     onConfirm: () => Promise<void>;
     isSheetOpen: boolean;
     sheetSide: SideOptions;
     setIsSheetOpen: Dispatch<SetStateAction<boolean>>;
-    handleEventCreate: (title: string, start: string, end: string, allDay: boolean, repeats: number) => void;
+    handleEventEdit: (id: string, title: string, start: string, end: string, allDay: boolean, color: string) => void
 }
 
-export default function ManageEventDialog({ eventName, onConfirm, isSheetOpen, sheetSide, setIsSheetOpen, handleEventCreate, id }: RemoveEventDialogProps) {
+export default function ManageEventDialog({ onConfirm, isSheetOpen, sheetSide, setIsSheetOpen, handleEventEdit, event }: RemoveEventDialogProps) {
     return (
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
@@ -34,9 +34,9 @@ export default function ManageEventDialog({ eventName, onConfirm, isSheetOpen, s
                 <SheetHeader>
                     <SheetTitle>Manage your Event</SheetTitle>
                     <SheetDescription>
-                        Event: {eventName}
+                        Event: {event ? event.title : ""}
                     </SheetDescription>
-                    <FormEvent handleEventCreate={handleEventCreate} id={id} />
+                    <FormEvent handleEventEdit={handleEventEdit} event={event} />
                     <Button variant="destructive" className="w-full mt-2" onClick={async () => { await onConfirm(); setIsSheetOpen(false); }}>
                         Remove
                     </Button>

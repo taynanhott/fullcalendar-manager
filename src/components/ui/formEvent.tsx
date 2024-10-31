@@ -1,35 +1,57 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "./input";
 import { Label } from "./label";
 import { Switch } from "./switch";
 import { Button } from "./button";
 import Alert from "./alert";
+import { EventApi } from "fullcalendar/index.js";
+import ColorSelector from "./color";
 
 interface Props {
-    id: number;
-    handleEventCreate: (title: string, start: string, end: string, allDay: boolean, repeats: number) => void;
+    event?: EventApi | null;
+    handleEventCreate?: (title: string, start: string, end: string, allDay: boolean, repeats: number, color: string) => void;
+    handleEventEdit?: (id: string, title: string, start: string, end: string, allDay: boolean, color: string) => void;
 }
 
-export default function FormEvent({ handleEventCreate, id }: Props) {
+export default function FormEvent({ handleEventCreate, handleEventEdit, event }: Props) {
     const repeatRef = useRef<HTMLInputElement>(null);
     const [isAllDay, setIsAllDay] = useState(false);
     const [isRepetitive, setIsRepetitive] = useState(false);
+    const [title, setTitle] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [isOpen, setIsOpen] = useState(false);
+    const [color, setColor] = useState('#3788d8')
+
+    useEffect(() => {
+        if (event) {
+            setTitle(event.title);
+            if (event.start) {
+                const start = new Date(event.start);
+                setStartTime(start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
+            }
+            if (event.end) {
+                const end = new Date(event.end);
+                setEndTime(end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
+            }
+
+            setIsAllDay(event.allDay);
+            setColor(event.backgroundColor);
+        }
+    }, [event]);
 
     function formatDateTime(time: string) {
-        return time && time.trim() !== '' ? `T${time}-03:00` : '';
+        return time && time.trim() !== '' ? `T${time}` : '';
     }
 
     const showWarning = () => {
         setIsOpen(true);
         setTimeout(() => {
             setIsOpen(false);
-        }, 3000)
-    }
+        }, 3000);
+    };
 
-    const validateForm = (title: string, start: string, end: string, allDay: boolean, repeats: number) => {
+    const validateForm = (title: string, start: string, end: string, allDay: boolean, repeats: number, color: string) => {
         if (!title || title.trim() === '') {
             showWarning();
             return false;
@@ -45,24 +67,33 @@ export default function FormEvent({ handleEventCreate, id }: Props) {
                 return false;
             }
         }
-
-        handleEventCreate(title, start, end, allDay, repeats);
-    }
+        
+        if (event && handleEventEdit) {
+            handleEventEdit(event.id, title, start, end, allDay, color);
+        } else if (handleEventCreate) {
+            handleEventCreate(title, start, end, allDay, repeats, color);
+        }
+    };
 
     return (
         <>
             <form className="space-y-4" onSubmit={(e) => {
                 e.preventDefault();
-                const title = (document.querySelector('#title') as HTMLInputElement).value;
                 const start = formatDateTime(startTime);
                 const end = formatDateTime(endTime);
                 const repeats = repeatRef.current ? +repeatRef.current.value : 1;
 
-                validateForm(title, start, end, isAllDay, repeats)
+                validateForm(title, start, end, isAllDay, repeats, color);
             }}>
                 <div className="space-y-2 text-start">
                     <Label htmlFor="title">Event Title</Label>
-                    <Input id="title" type="text" placeholder="Insert a event title" />
+                    <Input
+                        id="title"
+                        type="text"
+                        placeholder="Insert an event title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -77,44 +108,62 @@ export default function FormEvent({ handleEventCreate, id }: Props) {
                 {!isAllDay && (
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2 text-start">
-                            <Label htmlFor="start-time" className="">Start hour</Label>
-                            <Input id="start-time" type="time" onChange={(e) => setStartTime(e.target.value)} />
+                            <Label htmlFor="start-time">Start hour</Label>
+                            <Input
+                                id="start-time"
+                                type="time"
+                                value={startTime}
+                                onChange={(e) => setStartTime(e.target.value)}
+                            />
                         </div>
                         <div className="space-y-2 text-start">
                             <Label htmlFor="end-time">Ending time</Label>
-                            <Input id="end-time" type="time" onChange={(e) => setEndTime(e.target.value)} />
+                            <Input
+                                id="end-time"
+                                type="time"
+                                value={endTime}
+                                onChange={(e) => setEndTime(e.target.value)}
+                            />
                         </div>
                     </div>
                 )}
 
-                <div className="flex items-center space-x-2">
+                {!event && (<div className="flex items-center space-x-2">
                     <Switch
                         id="repetitive"
                         checked={isRepetitive}
                         onCheckedChange={setIsRepetitive}
                     />
                     <Label htmlFor="repetitive">Repeat event</Label>
-                </div>
+                </div>)}
 
                 {isRepetitive && (
                     <div className="space-y-2">
-                        <Label htmlFor="repeat-count">Number repeats</Label>
+                        <Label htmlFor="repeat-count">Number of repeats</Label>
                         <Input
                             id="repeat-count"
                             type="number"
                             min="1"
-                            placeholder="How much repeat this event?"
+                            placeholder="How many times to repeat this event?"
                             defaultValue={1}
                             ref={repeatRef}
                         />
                     </div>
                 )}
 
+                <div className="flex items-center space-x-2">
+                    <Label htmlFor="repeat-count">Select an color</Label>
+                    <ColorSelector
+                        value={color}
+                        onChange={setColor}
+                    />
+                </div>
+
                 <Button type="submit" className="w-full bg-[#2c3e50]">
-                    {id > 0 ? "Update the event" : "Create a new event"}
+                    {event ? "Update the event" : "Create a new event"}
                 </Button>
             </form>
             <Alert isOpen={isOpen} setIsOpen={setIsOpen} />
         </>
-    )
+    );
 }

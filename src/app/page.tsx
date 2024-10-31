@@ -31,7 +31,6 @@ type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 
 export default function Calendar() {
   const calendarRef = useRef<FullCalendar>(null);
-  const [hidden, setHidden] = useState(true);
   const [isDateSelectActive, setIsDateSelectActive] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
@@ -40,7 +39,7 @@ export default function Calendar() {
   const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
   const [toolbarConfig, setToolbarConfig] = useState({ left: 'prev,next', center: 'title', right: '' });
 
-  // Other functions ----------------------------------------------
+  // Other functions =======================================================================
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const small = window.innerWidth < 768;
@@ -57,12 +56,11 @@ export default function Calendar() {
     if (!isDateSelectActive) {
       if (calendarRef.current) {
         calendarRef.current.getApi().changeView('dayGridDay', selectInfo.dateStr);
-        setHidden(false);
       }
     }
   };
 
-  // Event add functions ----------------------------------------------
+  // Event add functions =======================================================================
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     setSelectedEventInfo(selectInfo);
     setIsSheetOpen(true);
@@ -78,7 +76,7 @@ export default function Calendar() {
   };
 
   // Create -----------------------------------------------------------
-  const handleEventCreate = (title: string, start: string, end: string, allDay: boolean, repeats: number) => {
+  const handleEventCreate = (title: string, start: string, end: string, allDay: boolean, repeats: number, color: string) => {
     const calendarApi = selectedEventInfo?.view.calendar;
     const eventStart = selectedEventInfo?.start;
     const eventEnd = selectedEventInfo?.end;
@@ -87,6 +85,9 @@ export default function Calendar() {
       calendarApi.unselect();
 
       let count = 0;
+      console.log(eventStart)
+      console.log(`${start}`)
+      console.log(`${end}`)
       while (count < repeats) {
         calendarApi.addEvent({
           id: createEventId(),
@@ -94,6 +95,8 @@ export default function Calendar() {
           start: allDay ? eventStart : moment(eventStart).format('YYYY-MM-DD') + start,
           end: allDay ? eventEnd : moment(eventStart).format('YYYY-MM-DD') + end,
           allDay,
+          backgroundColor: color,
+          borderColor: color
         });
         count++;
       }
@@ -101,7 +104,32 @@ export default function Calendar() {
     }
   };
 
-  // Event remove functions ----------------------------------------------
+  // Edit -----------------------------------------------------------
+  const handleEventEdit = (id: string, title: string, start: string, end: string, allDay: boolean, color: string) => {
+    const calendarApi = selectedEventInfo?.view.calendar;
+    const event = calendarApi?.getEventById(id);
+
+    if (calendarApi && event && event.start) {
+      const formattedStart = moment(event.start).format("YYYY-MM-DD") + start;
+      const formattedEnd = moment(event.start).format("YYYY-MM-DD") + end;
+
+      event.setProp("title", title);
+      console.log(allDay)
+      event.setAllDay(allDay);
+      event.setProp("backgroundColor", color);
+      event.setProp("borderColor", color);
+
+      if (allDay) {
+        event.setDates(moment(event.start).format("YYYY-MM-DD"), moment(event.end).format("YYYY-MM-DD"));
+      } else {
+        event.setDates(formattedStart, formattedEnd);
+      }
+
+      setIsEditOpen(false);
+    }
+  };
+
+  // Event remove functions =======================================================================
   function handleEventClick(clickInfo: { event: EventApi }) {
     setEventToManage(clickInfo.event);
     setIsEditOpen(true);
@@ -118,14 +146,13 @@ export default function Calendar() {
   const handleChangeView = (view: 'listWeek' | 'dayGridWeek' | 'dayGridMonth') => {
     if (calendarRef.current) {
       calendarRef.current.getApi().changeView(view);
-      setHidden(true);
     }
   };
 
   return (
     <div>
       <div className="p-4 mt-0 lg:mt-20">
-        {/* ----------------------------- Calendar ----------------------------- */}
+        {/* =================================== Calendar =============================================== */}
         <FullCalendar
           ref={calendarRef}
           headerToolbar={toolbarConfig}
@@ -146,21 +173,20 @@ export default function Calendar() {
           eventClick={handleEventClick}
         />
 
-        {/* ----------------------------- Event Remove ----------------------------- */}
+        {/* =================================== Event Remove =================================== */}
         <ManageEventDialog
-          id={eventToManage ? +eventToManage.id : 0}
-          eventName={eventToManage ? eventToManage.title : ""}
+          event={eventToManage}
           onConfirm={handleConfirmRemove}
           isSheetOpen={isEditOpen}
           sheetSide={sheetSide}
-          setIsSheetOpen={setIsEditOpen}  // Passe diretamente, sem função
-          handleEventCreate={handleEventCreate}
+          setIsSheetOpen={setIsEditOpen}
+          handleEventEdit={handleEventEdit}
         />
 
-        {/* ----------------------------- Event Form ----------------------------- */}
+        {/* =================================== Event Form =================================== */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
-            <Button className={`${hidden ? 'hidden' : ''} w-full mt-4 bg-[#2c3e50]`} type="button">
+            <Button className={`hidden w-full mt-4 bg-[#2c3e50]`} type="button">
               Create a new event
             </Button>
           </SheetTrigger>
@@ -170,7 +196,7 @@ export default function Calendar() {
               <SheetDescription>
                 Enter the title for your event below.
               </SheetDescription>
-              <FormEvent handleEventCreate={handleEventCreate} id={0} />
+              <FormEvent handleEventCreate={handleEventCreate} />
             </SheetHeader>
           </SheetContent>
         </Sheet>
