@@ -27,7 +27,7 @@ let small = false;
 let height = 650;
 if (typeof window !== 'undefined') {
   small = window.innerWidth < 768;
-  height = window.innerHeight >= 740 ? 650 : 500;
+  height = window.innerHeight >= 740 ? 650 : 580;
 }
 
 function createEventId() {
