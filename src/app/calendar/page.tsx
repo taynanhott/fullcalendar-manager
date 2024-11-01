@@ -173,6 +173,7 @@ export default function Calendar() {
                     editable={true}
                     selectable={true}
                     eventClick={handleEventClick}
+                    selectLongPressDelay={500}
                 />
 
                 {/* =================================== Event Remove =================================== */}
