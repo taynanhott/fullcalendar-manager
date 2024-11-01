@@ -1,9 +1,10 @@
 "use client";
 
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, UserCredential } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase/config";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUser } from "@/app/context/userContext";
 
 interface LoginGoogleFormProps {
     loginGoogle: (
@@ -13,21 +14,40 @@ interface LoginGoogleFormProps {
     ) => Promise<boolean | void>;
 }
 
+interface UserProps {
+    uid: string;
+    displayName: string;
+    email: string;
+    photoURL: string;
+}
+
 export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
+    const { handleSetUser } = useUser();
+
     async function signInWithGoogle() {
         const provider = new GoogleAuthProvider();
 
         try {
-            const result = await signInWithPopup(auth, provider);
+            const result: UserCredential = await signInWithPopup(auth, provider);
 
             if (result) {
+                const userInfo: UserProps = {
+                    uid: result.user.uid,
+                    displayName: result.user.displayName ?? '',
+                    email: result.user.email ?? '',
+                    photoURL: result.user.photoURL ?? '',
+                };
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                }
+                handleSetUser(userInfo);
                 await loginGoogle(
-                    result.user.uid as string,
-                    result.user.displayName as string,
-                    result.user.email as string
+                    result.user.uid,
+                    result.user.displayName || '',
+                    result.user.email || ''
                 ).then((response) => {
                     if (response === undefined) {
-                        console.error('Error')
+                        console.error('Error');
                     }
                 });
             }
@@ -52,7 +72,6 @@ export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
             </Card>
         </div>
     );
-    
 }
 
 function ChromeIcon(props: React.SVGProps<SVGSVGElement>) {
