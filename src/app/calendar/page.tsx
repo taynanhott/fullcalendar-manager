@@ -1,6 +1,6 @@
 "use client";
 
-import { DateSelectArg, EventApi } from '@fullcalendar/core';
+import { DateSelectArg, EventApi, EventInput } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -20,6 +20,8 @@ import ManageEventDialog from '@/components/ui/manage';
 import moment from 'moment';
 import Sidebar from '@/components/ui/sidebar';
 import FormEvent from '@/components/ui/formEvent';
+import { getEventsByUserId, writeEventData } from '@/firebase/config';
+import { useUser } from '../context/userContext';
 
 let eventGuid = 1;
 
@@ -37,6 +39,7 @@ function createEventId() {
 type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 
 export default function Calendar() {
+    const { user } = useUser();
     const calendarRef = useRef<FullCalendar>(null);
     const [isDateSelectActive, setIsDateSelectActive] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -45,6 +48,25 @@ export default function Calendar() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
     const [toolbarConfig, setToolbarConfig] = useState({ left: 'prev,next', center: 'title', right: '' });
+    const [events, setEvents] = useState<EventInput[]>([]);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const eventsData = await getEventsByUserId(user.uid);
+            const formattedEvents = Object.keys(eventsData).map(key => ({
+                id: key,
+                title: eventsData[key].title,
+                start: eventsData[key].start,
+                end: eventsData[key].end,
+                allDay: eventsData[key].allDay,
+                backgroundColor: eventsData[key].color,
+                borderColor: eventsData[key].color,
+            }));
+            setEvents(formattedEvents);
+        };
+
+        fetchEvents();
+    }, [user.uid]);
 
     // Other functions =======================================================================
     useEffect(() => {
@@ -80,7 +102,7 @@ export default function Calendar() {
     };
 
     // Create -----------------------------------------------------------
-    const handleEventCreate = (title: string, start: string, end: string, allDay: boolean, color: string) => {
+    const handleEventCreate = async (title: string, start: string, end: string, allDay: boolean, color: string) => {
         const calendarApi = selectedEventInfo?.view.calendar;
         const eventStart = selectedEventInfo?.start;
         const eventEnd = selectedEventInfo?.end;
@@ -92,11 +114,16 @@ export default function Calendar() {
             const repeats = allDay ? 1 : moment(eventEnd).diff(moment(eventStart), 'days');
 
             while (count < repeats) {
+                let startDate = allDay ? eventStart : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
+                let endDate = allDay ? eventStart : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
+
+                const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
+
                 calendarApi.addEvent({
-                    id: createEventId(),
+                    id,
                     title,
-                    start: allDay ? eventStart : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start,
-                    end: allDay ? eventEnd : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end,
+                    start: startDate,
+                    end: endDate,
                     allDay,
                     backgroundColor: color,
                     borderColor: color
@@ -169,7 +196,7 @@ export default function Calendar() {
                     select={handleDateSelect}
                     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
                     initialView="dayGridMonth"
-                    // events={'https://fullcalendar.io/api/demo-feeds/events.json'}
+                    events={events}
                     editable={true}
                     selectable={true}
                     eventClick={handleEventClick}
