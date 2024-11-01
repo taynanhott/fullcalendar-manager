@@ -7,6 +7,7 @@ import { Icon } from './icon'
 import { Home, Settings, HelpCircle, LogOut, Menu, User, List, CalendarDays, CalendarRange } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from "@/app/context/userContext";
+import Loading from "./loading";
 
 interface Props {
   className?: string,
@@ -15,8 +16,9 @@ interface Props {
 
 export default function Sidebar({ className, handleChangeView }: Props) {
   const { user } = useUser();
-  const [open, setOpen] = useState(false)
-  const [openAccount, setOpenAccount] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [openAccount, setOpenAccount] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className={`${className} fixed bottom-0 lg:bottom-auto top-auto lg:top-0 left-0 right-0 z-30`}>
@@ -30,7 +32,7 @@ export default function Sidebar({ className, handleChangeView }: Props) {
           <SheetContent side="left">
             <div className="pt-8 text-left">
               <h2 className="text-lg font-semibold mb-4">Menu</h2>
-              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek'); setOpen(false); }}>
+              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek'); setOpen(false); }} className="text-lg p-4">
                 <CalendarDays className="mr-2 h-4 w-4" />
                 Manage Week
               </Button>
@@ -55,7 +57,7 @@ export default function Sidebar({ className, handleChangeView }: Props) {
           </SheetTrigger>
           <SheetContent side="right">
             <div className="flex flex-col h-full">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 mb-6">
                 <Icon source={user ? user.photoURL : ''} />
                 <div>
                   <h2 className="font-semibold">{user ? user.displayName : 'User actions'}</h2>
@@ -63,20 +65,20 @@ export default function Sidebar({ className, handleChangeView }: Props) {
                 </div>
               </div>
 
-              <div className="pt-8 text-left">
-                <Button variant="ghost" className="block">
+              <div className="pt-8">
+                <Button variant="ghost" className="w-full flex justify-start">
                   <a href="#" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2 text-lg">
                     <User className="h-5 w-5" />
                     <span>My Profile</span>
                   </a>
                 </Button>
-                <Button variant="ghost" className="block">
+                <Button variant="ghost" className="w-full flex justify-start">
                   <a href="#" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2 text-lg">
                     <Settings className="h-5 w-5" />
                     <span>Configs</span>
                   </a>
                 </Button>
-                <Button variant="ghost" className="block">
+                <Button variant="ghost" className="w-full flex justify-start">
                   <a href="#" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2 text-lg">
                     <HelpCircle className="h-5 w-5" />
                     <span>Help</span>
@@ -85,7 +87,7 @@ export default function Sidebar({ className, handleChangeView }: Props) {
               </div>
 
               <Button
-                onClick={() => setOpenAccount(false)}
+                onClick={() => { setOpenAccount(false); setLoading(true); }}
                 asChild
               >
                 <Link
@@ -101,6 +103,7 @@ export default function Sidebar({ className, handleChangeView }: Props) {
           </SheetContent>
         </Sheet>
       </nav>
+      <Loading active={loading} />
     </div>
   )
 }

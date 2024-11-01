@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase/config";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/app/context/userContext";
+import { useState } from "react";
+import Loading from "@/components/ui/loading";
 
 interface LoginGoogleFormProps {
     loginGoogle: (
@@ -22,9 +24,11 @@ interface UserProps {
 }
 
 export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
+    const [loading, setLoading] = useState(false);
     const { handleSetUser } = useUser();
 
     async function signInWithGoogle() {
+        setLoading(true);
         const provider = new GoogleAuthProvider();
 
         try {
@@ -46,12 +50,14 @@ export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
                     result.user.displayName || '',
                     result.user.email || ''
                 ).then((response) => {
+                    setLoading(false);
                     if (response === undefined) {
                         console.error('Error');
                     }
                 });
             }
         } catch (error) {
+            setLoading(false);
             console.error("failed to sign in with Google account:", error);
         }
     }
@@ -70,6 +76,7 @@ export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
                     </Button>
                 </CardContent>
             </Card>
+            <Loading active={loading} />
         </div>
     );
 }
