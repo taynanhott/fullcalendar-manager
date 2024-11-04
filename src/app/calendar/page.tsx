@@ -22,6 +22,7 @@ import Sidebar from '@/components/ui/sidebar';
 import FormEvent from '@/components/ui/formEvent';
 import { deleteEvent, getEventsByUserId, updateEvent, writeEventData } from '@/firebase/config';
 import { useUser } from '../context/userContext';
+import Loading from '@/components/ui/loading';
 
 let small = false;
 let height = 650;
@@ -36,6 +37,7 @@ type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 export default function Calendar() {
     const { user } = useUser();
     const calendarRef = useRef<FullCalendar>(null);
+    const [loading, setLoading] = useState(false);
     const [isDateSelectActive, setIsDateSelectActive] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
@@ -47,11 +49,14 @@ export default function Calendar() {
 
     useEffect(() => {
         const fetchEvents = async () => {
+            setLoading(true);
             try {
                 const eventsData = await getEventsByUserId(user.uid);
                 setEvents(eventsData);
+                setLoading(false);
             } catch (error) {
                 console.error("Error fetching events:", error);
+                setLoading(false);
             }
         };
 
@@ -103,9 +108,10 @@ export default function Calendar() {
             let count = 0;
             const repeats = allDay ? 1 : moment(eventEnd).diff(moment(eventStart), 'days');
 
+            setLoading(true);
             while (count < repeats) {
-                let startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
-                let endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
+                const startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
+                const endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
 
                 const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
 
@@ -121,40 +127,34 @@ export default function Calendar() {
                 count++;
             }
             setIsSheetOpen(false);
+            setLoading(false);
         }
     };
 
     // Edit -----------------------------------------------------------
     const handleEventEdit = (eventEdit: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => {
-        const event = eventEdit;
+        const formattedStart = allDay ? eventEdit.startStr : moment(eventEdit.start).format("YYYY-MM-DD") + start;
+        const formattedEnd = allDay ? eventEdit.endStr : moment(eventEdit.start).format("YYYY-MM-DD") + end;
 
-        if (event && event.start && event.id) {
-            const formattedStart = moment(event.start).format("YYYY-MM-DD") + start;
-            const formattedEnd = moment(event.start).format("YYYY-MM-DD") + end;
+        setLoading(true);
+        updateEvent(eventEdit.id, {
+            id: eventEdit.id,
+            title: title,
+            start: formattedStart,
+            end: formattedEnd,
+            allDay: allDay,
+            color: color,
+            userId: user.uid
+        });
 
-            updateEvent(event.id, {
-                id: event.id,
-                title: event.title,
-                start: allDay ? moment(event.start).format("YYYY-MM-DD") : formattedStart,
-                end: allDay ? moment(event.end).format("YYYY-MM-DD") : formattedEnd,
-                allDay: allDay,
-                color: color,
-                userId: user.uid
-            });
+        // Update event properties after updating backend
+        eventEdit.setProp("title", title);
+        eventEdit.setDates(formattedStart, formattedEnd, { allDay: allDay });
+        eventEdit.setProp("backgroundColor", color);
+        eventEdit.setProp("borderColor", color);
 
-            event.setProp("title", title);
-            event.setAllDay(allDay);
-            event.setProp("backgroundColor", color);
-            event.setProp("borderColor", color);
-
-            if (allDay) {
-                event.setDates(moment(event.start).format("YYYY-MM-DD"), moment(event.end).format("YYYY-MM-DD"));
-            } else {
-                event.setDates(formattedStart, formattedEnd);
-            }
-
-            setIsEditOpen(false);
-        }
+        setIsEditOpen(false);
+        setLoading(false);
     };
 
     // Event remove functions =======================================================================
@@ -178,6 +178,23 @@ export default function Calendar() {
         }
     };
 
+    const handleResizeEventEdit = (eventEdit: EventApi) => {
+        setLoading(true);
+        updateEvent(eventEdit.id, {
+            id: eventEdit.id,
+            title: eventEdit.title,
+            start: eventEdit.startStr,
+            end: eventEdit.endStr,
+            allDay: eventEdit.allDay,
+            color: eventEdit.borderColor,
+            userId: user.uid
+        }).then(() => {
+            eventEdit.setDates(eventEdit.startStr, eventEdit.endStr, { allDay: eventEdit.allDay });
+        }).finally(() => {
+            setLoading(false);
+        });
+    };
+
     return (
         <div>
             <div className="p-4 mt-0 lg:mt-20">
@@ -185,21 +202,22 @@ export default function Calendar() {
                 <FullCalendar
                     ref={calendarRef}
                     headerToolbar={toolbarConfig}
+                    height={height}
                     views={{
                         dayGridMonth: {
-                            titleFormat: { month: 'short', year: 'numeric' }
-                        }
+                            titleFormat: { month: 'short', year: 'numeric' },
+                        },
                     }}
-                    height={height}
-                    dayMaxEvents={true}
-                    dateClick={handleDateClick}
-                    select={handleDateSelect}
                     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
                     initialView="dayGridMonth"
                     events={events}
                     editable={true}
                     selectable={true}
+                    select={handleDateSelect}
+                    dateClick={handleDateClick}
                     eventClick={handleEventClick}
+                    eventDrop={(info) => handleResizeEventEdit(info.event)}
+                    eventResize={(info) => handleResizeEventEdit(info.event)}
                     selectLongPressDelay={500}
                 />
 
@@ -232,6 +250,7 @@ export default function Calendar() {
                 </Sheet>
             </div>
             <Sidebar handleChangeView={handleChangeView} />
+            <Loading active={loading} />
         </div >
     );
 }
