@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Icon } from './icon'
-import { Home, Settings, HelpCircle, LogOut, Menu, User, List, CalendarDays, CalendarRange } from 'lucide-react'
+import { Home, LogOut, Menu, List, CalendarDays, CalendarRange, Github, Linkedin } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from "@/app/context/userContext";
 import Loading from "./loading";
@@ -32,15 +32,15 @@ export default function Sidebar({ className, handleChangeView }: Props) {
           <SheetContent side="left">
             <div className="pt-8 text-left">
               <h2 className="text-lg font-semibold mb-4">Menu</h2>
-              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek'); setOpen(false); }} className="text-lg p-4">
+              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek'); setOpen(false); }} className="w-full flex justify-start mb-8">
                 <CalendarDays className="mr-2 h-4 w-4" />
                 Manage Week
               </Button>
-              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridMonth'); setOpen(false); }} className="text-lg">
+              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridMonth'); setOpen(false); }} className="w-full flex justify-start mb-8">
                 <CalendarRange className="mr-2 h-4 w-4" />
                 Manage Month
               </Button>
-              <Button variant="ghost" onClick={async () => { handleChangeView('listWeek'); setOpen(false); }} className="text-lg">
+              <Button variant="ghost" onClick={async () => { handleChangeView('listWeek'); setOpen(false); }} className="w-full flex justify-start">
                 <List className="mr-2 h-4 w-4" />Manage List
               </Button>
             </div>
@@ -65,23 +65,18 @@ export default function Sidebar({ className, handleChangeView }: Props) {
                 </div>
               </div>
 
-              <div className="pt-8">
+              <h2 className="text-lg font-semibold mb-[-16px]">Project infos</h2>
+              <div className="pt-8 space-y-4">
                 <Button variant="ghost" className="w-full flex justify-start">
-                  <a href="#" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2 text-lg">
-                    <User className="h-5 w-5" />
-                    <span>My Profile</span>
+                  <a href="https://www.linkedin.com/in/taynan-hott/" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                    <Linkedin className="h-5 w-5" />
+                    <span>Linkedin</span>
                   </a>
                 </Button>
                 <Button variant="ghost" className="w-full flex justify-start">
-                  <a href="#" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2 text-lg">
-                    <Settings className="h-5 w-5" />
-                    <span>Configs</span>
-                  </a>
-                </Button>
-                <Button variant="ghost" className="w-full flex justify-start">
-                  <a href="#" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2 text-lg">
-                    <HelpCircle className="h-5 w-5" />
-                    <span>Help</span>
+                  <a href="https://github.com/taynanhott" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                    <Github className="h-5 w-5" />
+                    <span>Repository</span>
                   </a>
                 </Button>
               </div>
