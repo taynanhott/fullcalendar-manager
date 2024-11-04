@@ -111,7 +111,7 @@ export default function Calendar() {
             setLoading(true);
             while (count < repeats) {
                 const startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
-                const endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
+                const endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end;
 
                 const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
 
@@ -133,15 +133,15 @@ export default function Calendar() {
 
     // Edit -----------------------------------------------------------
     const handleEventEdit = (eventEdit: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => {
-        const formattedStart = allDay ? eventEdit.startStr : moment(eventEdit.start).format("YYYY-MM-DD") + start;
-        const formattedEnd = allDay ? eventEdit.endStr : moment(eventEdit.start).format("YYYY-MM-DD") + end;
+        const formattedStart = allDay ? moment(eventEdit.startStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + start;
+        const formattedEnd = allDay ? moment(eventEdit.endStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + end;
 
         setLoading(true);
         updateEvent(eventEdit.id, {
             id: eventEdit.id,
             title: title,
             start: formattedStart,
-            end: formattedEnd,
+            end: formattedStart === formattedEnd ? moment(formattedEnd).add(1, 'day').format("YYYY-MM-DD") : formattedEnd,
             allDay: allDay,
             color: color,
             userId: user.uid
@@ -149,7 +149,7 @@ export default function Calendar() {
 
         // Update event properties after updating backend
         eventEdit.setProp("title", title);
-        eventEdit.setDates(formattedStart, formattedEnd, { allDay: allDay });
+        eventEdit.setDates(formattedStart, formattedStart === formattedEnd ? moment(formattedEnd).add(1, 'day').format("YYYY-MM-DD") : formattedEnd, { allDay: allDay });
         eventEdit.setProp("backgroundColor", color);
         eventEdit.setProp("borderColor", color);
 
