@@ -10,7 +10,7 @@ import ColorSelector from "./color";
 interface Props {
     event?: EventApi | null;
     handleEventCreate?: (title: string, start: string, end: string, allDay: boolean, color: string) => void;
-    handleEventEdit?: (id: string, title: string, start: string, end: string, allDay: boolean, color: string) => void;
+    handleEventEdit?: (event: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => void;
 }
 
 export default function FormEvent({ handleEventCreate, handleEventEdit, event }: Props) {
@@ -67,7 +67,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
         }
 
         if (event && handleEventEdit) {
-            handleEventEdit(event.id, title, start, end, allDay, color);
+            handleEventEdit(event, title, start, end, allDay, color);
         } else if (handleEventCreate) {
             handleEventCreate(title, start, end, allDay, color);
         }

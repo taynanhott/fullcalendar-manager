@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref, set, get, push } from 'firebase/database';
+import { getDatabase, ref, set, get, push, child, query, orderByChild, equalTo } from 'firebase/database';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -21,6 +21,7 @@ function writeEventData(title: string, start: string | Date, end: string | Date,
   const newReference = push(reference);
 
   set(newReference, {
+    id: newReference.key,
     title: title,
     start: start,
     end: end,
@@ -32,23 +33,47 @@ function writeEventData(title: string, start: string | Date, end: string | Date,
   return newReference;
 }
 
-async function getEventsByUserId(userId: string) {
+async function getEventsByUserId(userId: string): Promise<Event[]> {
   const db = getDatabase();
-  const eventsRef = ref(db, `events/${userId}`);
+  const eventsRef = ref(db, "event");
+
+  const userQuery = query(eventsRef, orderByChild("userId"), equalTo(userId));
+  const snapshot = await get(userQuery);
+
+  const events: Event[] = [];
+  if (snapshot.exists()) {
+    snapshot.forEach((childSnapshot) => {
+      const eventData = childSnapshot.val() as Event;
+      events.push(eventData);
+    });
+  } else {
+    console.log("Nenhum dado encontrado.");
+  }
+
+  return events;
+}
+
+async function updateEvent(eventId: string, updatedData: { id: string, title: string; start: string | Date; end: string | Date; allDay: boolean; color: string; userId: string }): Promise<void> {
+  const db = getDatabase();
+  const eventRef = ref(db, `event/${eventId}`);
 
   try {
-    const snapshot = await get(eventsRef);
-    if (snapshot.exists()) {
-      console.log('Dados retornados:', snapshot.val());
-      return snapshot.val();
-    } else {
-      console.log('Nenhum dado encontrado para o userId:', userId);
-      return {};
-    }
+    await set(eventRef, updatedData);
   } catch (error) {
-    console.error('Erro ao buscar eventos:', error);
-    return {};
+    console.error("Erro ao atualizar evento:", error);
   }
 }
 
-export { auth, writeEventData, getEventsByUserId };
+async function deleteEvent(eventId: string): Promise<void> {
+  const db = getDatabase();
+  const eventRef = ref(db, `event/${eventId}`);
+
+  try {
+    await set(eventRef, null);
+    console.log(`Evento ${eventId} deletado com sucesso.`);
+  } catch (error) {
+    console.error("Erro ao deletar evento:", error);
+  }
+}
+
+export { auth, writeEventData, getEventsByUserId, deleteEvent, updateEvent };

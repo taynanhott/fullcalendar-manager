@@ -19,7 +19,7 @@ interface RemoveEventDialogProps {
     isSheetOpen: boolean;
     sheetSide: SideOptions;
     setIsSheetOpen: Dispatch<SetStateAction<boolean>>;
-    handleEventEdit: (id: string, title: string, start: string, end: string, allDay: boolean, color: string) => void
+    handleEventEdit: (event: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => void
 }
 
 export default function ManageEventDialog({ onConfirm, isSheetOpen, sheetSide, setIsSheetOpen, handleEventEdit, event }: RemoveEventDialogProps) {
