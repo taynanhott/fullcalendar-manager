@@ -63,21 +63,13 @@ export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <Card className="w-[350px]">
-                <CardHeader className="text-center">
-                    <CardTitle className="text-2xl font-bold">Full Calendar Project</CardTitle>
-                    <CardDescription>Sign in to access your calendar</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Button className="w-full" variant="outline" onClick={signInWithGoogle}>
-                        <ChromeIcon className="mr-2 h-5 w-5" />
-                        Sign in with Google
-                    </Button>
-                </CardContent>
-            </Card>
+        <>
+            <Button className="w-44" variant="outline" onClick={signInWithGoogle}>
+                <ChromeIcon className="mr-2 h-5 w-5" />
+                Sign in with Google
+            </Button>
             <Loading active={loading} />
-        </div>
+        </>
     );
 }
 
