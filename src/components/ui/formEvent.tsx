@@ -145,7 +145,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                             checked={useRepeat}
                             onCheckedChange={setUseRepeat}
                         />
-                        <Label htmlFor="all-day">Event repeat</Label>
+                        <Label htmlFor="all-day">Recurring Event</Label>
                     </div>)
                 }
 
@@ -162,7 +162,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                             />
                         </div>
                         <div className="space-y-2 text-start">
-                            <Label htmlFor="type-repeat">Type Repeat</Label>
+                            <Label htmlFor="type-repeat">Type of Repetition</Label>
                             <RadioGroup defaultValue="day" onChange={(e: ChangeEvent<HTMLInputElement>) => setTypeRepeat(e.target.value)}>
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="day" id="r1" />
