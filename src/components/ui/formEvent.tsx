@@ -1,25 +1,32 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "./input";
 import { Label } from "./label";
 import { Switch } from "./switch";
 import { Button } from "./button";
 import Alert from "./alert";
-import { EventApi } from "fullcalendar/index.js";
+import { DateSelectArg, EventApi } from "fullcalendar/index.js";
 import ColorSelector from "./color";
+import { RadioGroup, RadioGroupItem } from "./radio-group";
+import moment from "moment";
 
 interface Props {
     event?: EventApi | null;
-    handleEventCreate?: (title: string, start: string, end: string, allDay: boolean, color: string) => void;
+    handleEventCreate?: (title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string) => void;
     handleEventEdit?: (event: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => void;
+    selectedEventInfo?: DateSelectArg | null
 }
 
-export default function FormEvent({ handleEventCreate, handleEventEdit, event }: Props) {
+export default function FormEvent({ handleEventCreate, handleEventEdit, selectedEventInfo, event }: Props) {
     const [isAllDay, setIsAllDay] = useState(false);
     const [title, setTitle] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [isOpen, setIsOpen] = useState(false);
-    const [color, setColor] = useState('#3788d8')
+    const [color, setColor] = useState('#3788d8');
+    const [oneDay] = useState(moment(selectedEventInfo?.end).diff(moment(selectedEventInfo?.start), 'days'));
+    const [repeat, setRepeat] = useState(1);
+    const [useRepeat, setUseRepeat] = useState(false);
+    const [typeRepeat, setTypeRepeat] = useState('day');
 
     useEffect(() => {
         if (event) {
@@ -32,7 +39,6 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
                 const end = new Date(event.end);
                 setEndTime(end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
             }
-
             setIsAllDay(event.allDay);
             setColor(event.backgroundColor);
         }
@@ -49,7 +55,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
         }, 3000);
     };
 
-    const validateForm = (title: string, start: string, end: string, allDay: boolean, color: string) => {
+    const validateForm = (title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string) => {
         if (!title || title.trim() === '') {
             showWarning();
             return false;
@@ -69,7 +75,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
         if (event && handleEventEdit) {
             handleEventEdit(event, title, start, end, allDay, color);
         } else if (handleEventCreate) {
-            handleEventCreate(title, start, end, allDay, color);
+            handleEventCreate(title, start, end, allDay, color, repeat, typeRepeat);
         }
     };
 
@@ -80,7 +86,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
                 const start = formatDateTime(startTime);
                 const end = formatDateTime(endTime);
 
-                validateForm(title, start, end, isAllDay, color);
+                validateForm(title, start, end, isAllDay, color, repeat, typeRepeat);
             }}>
                 <div className="space-y-2 text-start">
                     <Label htmlFor="title">Event Title</Label>
@@ -132,6 +138,44 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, event }:
                         onChange={setColor}
                     />
                 </div>
+                {(!event && oneDay == 1) && (
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            id="all-day"
+                            checked={useRepeat}
+                            onCheckedChange={setUseRepeat}
+                        />
+                        <Label htmlFor="all-day">Event repeat</Label>
+                    </div>)
+                }
+
+                {useRepeat && (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2 text-start">
+                            <Label htmlFor="start-time">Repeats</Label>
+                            <Input
+                                id="repeat"
+                                type="number"
+                                min="1"
+                                value={repeat}
+                                onChange={(e) => setRepeat(Number(e.target.value))}
+                            />
+                        </div>
+                        <div className="space-y-2 text-start">
+                            <Label htmlFor="type-repeat">Type Repeat</Label>
+                            <RadioGroup defaultValue="day" onChange={(e: ChangeEvent<HTMLInputElement>) => setTypeRepeat(e.target.value)}>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="day" id="r1" />
+                                    <Label htmlFor="r1">Day</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="week" id="r2" />
+                                    <Label htmlFor="r2">Week</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    </div>
+                )}
 
                 <Button type="submit" className="w-full bg-[#2c3e50]">
                     {event ? "Update the event" : "Create a new event"}

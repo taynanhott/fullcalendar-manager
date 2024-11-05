@@ -97,7 +97,7 @@ export default function Calendar() {
     };
 
     // Create -----------------------------------------------------------
-    const handleEventCreate = async (title: string, start: string, end: string, allDay: boolean, color: string) => {
+    const handleEventCreate = async (title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string) => {
         const calendarApi = selectedEventInfo?.view.calendar;
         const eventStart = selectedEventInfo?.start;
         const eventEnd = selectedEventInfo?.end;
@@ -106,25 +106,65 @@ export default function Calendar() {
             calendarApi.unselect();
 
             let count = 0;
-            const repeats = allDay ? 1 : moment(eventEnd).diff(moment(eventStart), 'days');
+            const daysDiff = allDay ? 1 : moment(eventEnd).diff(moment(eventStart), 'days');
 
             setLoading(true);
-            while (count < repeats) {
-                const startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
-                const endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end;
+            if (daysDiff == 1 && repeat > 1) {
+                if (typeRepeat == 'day') {
+                    while (count < repeat) {
+                        const startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).format('YYYY-MM-DD') + start;
+                        const endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).format('YYYY-MM-DD') + end;
 
-                const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
+                        const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
 
-                calendarApi.addEvent({
-                    id,
-                    title,
-                    start: startDate,
-                    end: endDate,
-                    allDay,
-                    backgroundColor: color,
-                    borderColor: color
-                });
-                count++;
+                        calendarApi.addEvent({
+                            id,
+                            title,
+                            start: startDate,
+                            end: endDate,
+                            allDay,
+                            backgroundColor: color,
+                            borderColor: color
+                        });
+                        count++;
+                    }
+                } else if (typeRepeat == 'week') {
+                    while (count < repeat) {
+                        const startDate = allDay ? moment(eventStart).add(count, 'week').format('YYYY-MM-DD') : moment(eventStart).add(count, 'week').format('YYYY-MM-DD') + start;
+                        const endDate = allDay ? moment(eventEnd).add(count, 'week').format('YYYY-MM-DD') : moment(eventStart).add(count, 'week').format('YYYY-MM-DD') + end;
+
+                        const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
+
+                        calendarApi.addEvent({
+                            id,
+                            title,
+                            start: startDate,
+                            end: endDate,
+                            allDay,
+                            backgroundColor: color,
+                            borderColor: color
+                        });
+                        count++;
+                    }
+                }
+            } else {
+                while (count < daysDiff) {
+                    const startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
+                    const endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end;
+
+                    const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
+
+                    calendarApi.addEvent({
+                        id,
+                        title,
+                        start: startDate,
+                        end: endDate,
+                        allDay,
+                        backgroundColor: color,
+                        borderColor: color
+                    });
+                    count++;
+                }
             }
             setIsSheetOpen(false);
             setLoading(false);
@@ -244,7 +284,7 @@ export default function Calendar() {
                             <SheetDescription>
                                 Enter the title for your event below.
                             </SheetDescription>
-                            <FormEvent handleEventCreate={handleEventCreate} />
+                            <FormEvent handleEventCreate={handleEventCreate} selectedEventInfo={selectedEventInfo} />
                         </SheetHeader>
                     </SheetContent>
                 </Sheet>
