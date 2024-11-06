@@ -24,6 +24,7 @@ import { deleteEvent, getEventsByUserId, updateEvent, writeEventData } from '@/f
 import { useUser } from '../context/userContext';
 import Loading from '@/components/ui/loading';
 import { motion } from "framer-motion";
+import NavButton from '@/components/ui/navButton';
 
 let small = false;
 let height = 650;
@@ -240,6 +241,7 @@ export default function Calendar() {
         <div>
             <div className="p-4 mt-0 lg:mt-20">
                 {/* =================================== Calendar =============================================== */}
+                <NavButton handleChangeView={handleChangeView} />
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -297,7 +299,7 @@ export default function Calendar() {
                     </SheetContent>
                 </Sheet>
             </div>
-            <Sidebar handleChangeView={handleChangeView} />
+            <Sidebar />
             <Loading active={loading} />
         </div >
     );

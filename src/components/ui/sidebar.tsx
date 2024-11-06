@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Icon } from './icon'
-import { LogOut, Menu, List, CalendarDays, CalendarRange, Github, Linkedin } from 'lucide-react'
+import { LogOut, Menu, CalendarDays, Github, Linkedin } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from "@/app/context/userContext";
 import Loading from "./loading";
@@ -13,10 +13,9 @@ import { motion } from "framer-motion";
 
 interface Props {
   className?: string,
-  handleChangeView: (view: "listWeek" | "dayGridWeek" | "dayGridMonth") => void
 }
 
-export default function Sidebar({ className, handleChangeView }: Props) {
+export default function Sidebar({ className }: Props) {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
   const [openAccount, setOpenAccount] = useState(false);
@@ -32,47 +31,44 @@ export default function Sidebar({ className, handleChangeView }: Props) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-            <div className="pt-8 text-left">
-              <h2 className="text-lg font-semibold mb-4">Menu</h2>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek'); setOpen(false); }} className="w-full flex justify-start mb-8 lg:mb-4">
-                  <CalendarDays className="mr-2 h-4 w-4" />
-                  Manage Week
-                </Button>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.3 }}
-                viewport={{ once: true }}
-              >
-                <Button variant="ghost" onClick={async () => { handleChangeView('dayGridMonth'); setOpen(false); }} className="w-full flex justify-start mb-8 lg:mb-4">
-                  <CalendarRange className="mr-2 h-4 w-4" />
-                  Manage Month
-                </Button>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.5 }}
-                viewport={{ once: true }}
-              >
-                <Button variant="ghost" onClick={async () => { handleChangeView('listWeek'); setOpen(false); }} className="w-full flex justify-start">
-                  <List className="mr-2 h-4 w-4" />Manage List
-                </Button>
-              </motion.div>
+
+            <div className="flex flex-col h-full">
+              <div className="pt-36 lg:pt-12 space-y-4">
+                <h2 className="text-lg font-semibold ">Menu</h2>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Button variant="ghost" className="w-full flex justify-start">
+                    <a href="/calendar" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                      <CalendarDays className="h-5 w-5" />
+                      <span>Calendar</span>
+                    </a>
+                  </Button>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                  viewport={{ once: true }}
+                >
+                  <Button variant="ghost" className="w-full flex justify-start">
+                    <a href="/calendar/dashboard" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                      <CalendarDays className="h-5 w-5" />
+                      <span>Dashboard</span>
+                    </a>
+                  </Button>
+                </motion.div>
+              </div>
             </div>
           </SheetContent>
         </Sheet>
-        <Button variant="ghost" size="icon" aria-label="Home" className="w-[130px] h-[40px] hidden lg:block rounded-full hover:bg-transparent" onClick={() => handleChangeView('dayGridMonth')}>
+        <Button variant="ghost" size="icon" aria-label="Home" className="w-[130px] h-[40px] hidden lg:block rounded-full hover:bg-transparent" onClick={() => { }}>
           <Image src="/image/logo.png" width={130} height={40} alt="logo" />
         </Button>
-        <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden rounded-full w-[40px] h-[40px] hover:bg-transparent" onClick={() => handleChangeView('dayGridMonth')}>
+        <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden rounded-full w-[40px] h-[40px] hover:bg-transparent" onClick={() => { }}>
           <Image src="/image/logo-ico.png" width={40} height={40} alt="logo" />
         </Button>
         <Sheet open={openAccount} onOpenChange={setOpenAccount}>
