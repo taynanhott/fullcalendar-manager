@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase/config";
 import { useUser } from "@/app/context/userContext";
 import { useState } from "react";
-import Loading from "@/components/ui/loading";
 
 interface LoginGoogleFormProps {
     loginGoogle: (
@@ -62,23 +61,22 @@ export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
     }
 
     return (
-        <div className="w-full">
-            <div className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-1/2 w-96 h-full rounded-full bg-gray-100" />
-            <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-1/2 w-96 h-full rounded-full bg-gray-100" />
-            <div className="border border-gray-300 shadow-lg w-96 h-80 p-6 mx-auto backdrop-blur-sm rounded-[80px] flex flex-col items-center justify-center relative z-10">
-                <div className="text-center">
-                    <span className="mx-auto mb-4 loader-logo"></span>
-                    <div className="text-3xl font-bold mb-10">FullCalendar Project</div>
-                    <div className="mb-4">Sign in to access your calendar</div>
-                </div>
-                <Button className="w-44" variant="outline" onClick={signInWithGoogle}>
-                    <ChromeIcon className="mr-2 h-5 w-5" />
-                    Sign in with Google
-                </Button>
-            </div>
-            <Loading active={loading} />
-        </div>
-    );
+        <>
+            {!loading ? <Button
+                className="flex shadow-lg w-10/12 border-gray-400 border-opacity-35 justify-center bg-transparent mx-auto backdrop-blur-3xl hover:bg-white/30 hover:scale-110 transition-all duration-300"
+                variant="outline"
+                onClick={signInWithGoogle}>
+                <ChromeIcon className="mr-2 h-5 w-5" />
+                Sign in with Google
+            </Button> :
+                <Button
+                    className="flex shadow-lg w-10/12 border-gray-400 border-opacity-35 justify-center bg-transparent mx-auto backdrop-blur-3xl hover:bg-white/30 hover:scale-110 transition-all duration-300"
+                    variant="outline"
+                    onClick={signInWithGoogle}>
+                        Waiting for login...
+                </Button>}
+        </>
+    )
 }
 
 function ChromeIcon(props: React.SVGProps<SVGSVGElement>) {
