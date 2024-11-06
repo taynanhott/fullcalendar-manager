@@ -3,7 +3,6 @@
 import { GoogleAuthProvider, signInWithPopup, UserCredential } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase/config";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/app/context/userContext";
 import { useState } from "react";
 import Loading from "@/components/ui/loading";
