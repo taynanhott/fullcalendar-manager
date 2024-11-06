@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Icon } from './icon'
-import { Home, LogOut, Menu, List, CalendarDays, CalendarRange, Github, Linkedin } from 'lucide-react'
+import { LogOut, Menu, List, CalendarDays, CalendarRange, Github, Linkedin } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from "@/app/context/userContext";
 import Loading from "./loading";
