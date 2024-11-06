@@ -23,6 +23,7 @@ import FormEvent from '@/components/ui/formEvent';
 import { deleteEvent, getEventsByUserId, updateEvent, writeEventData } from '@/firebase/config';
 import { useUser } from '../context/userContext';
 import Loading from '@/components/ui/loading';
+import { motion } from "framer-motion";
 
 let small = false;
 let height = 650;
@@ -239,27 +240,34 @@ export default function Calendar() {
         <div>
             <div className="p-4 mt-0 lg:mt-20">
                 {/* =================================== Calendar =============================================== */}
-                <FullCalendar
-                    ref={calendarRef}
-                    headerToolbar={toolbarConfig}
-                    height={height}
-                    views={{
-                        dayGridMonth: {
-                            titleFormat: { month: 'short', year: 'numeric' },
-                        },
-                    }}
-                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-                    initialView="dayGridMonth"
-                    events={events}
-                    editable={true}
-                    selectable={true}
-                    select={handleDateSelect}
-                    dateClick={handleDateClick}
-                    eventClick={handleEventClick}
-                    eventDrop={(info) => handleResizeEventEdit(info.event)}
-                    eventResize={(info) => handleResizeEventEdit(info.event)}
-                    selectLongPressDelay={500}
-                />
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 1 }}
+                    viewport={{ once: true }}
+                >
+                    <FullCalendar
+                        ref={calendarRef}
+                        headerToolbar={toolbarConfig}
+                        height={height}
+                        views={{
+                            dayGridMonth: {
+                                titleFormat: { month: 'short', year: 'numeric' },
+                            },
+                        }}
+                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+                        initialView="dayGridMonth"
+                        events={events}
+                        editable={true}
+                        selectable={true}
+                        select={handleDateSelect}
+                        dateClick={handleDateClick}
+                        eventClick={handleEventClick}
+                        eventDrop={(info) => handleResizeEventEdit(info.event)}
+                        eventResize={(info) => handleResizeEventEdit(info.event)}
+                        selectLongPressDelay={500}
+                    />
+                </motion.div>
 
                 {/* =================================== Event Remove =================================== */}
                 <ManageEventDialog

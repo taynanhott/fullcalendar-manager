@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { useUser } from "@/app/context/userContext";
 import Loading from "./loading";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 interface Props {
   className?: string,
@@ -33,17 +34,38 @@ export default function Sidebar({ className, handleChangeView }: Props) {
           <SheetContent side="left">
             <div className="pt-8 text-left">
               <h2 className="text-lg font-semibold mb-4">Menu</h2>
-              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek'); setOpen(false); }} className="w-full flex justify-start mb-8">
-                <CalendarDays className="mr-2 h-4 w-4" />
-                Manage Week
-              </Button>
-              <Button variant="ghost" onClick={async () => { handleChangeView('dayGridMonth'); setOpen(false); }} className="w-full flex justify-start mb-8">
-                <CalendarRange className="mr-2 h-4 w-4" />
-                Manage Month
-              </Button>
-              <Button variant="ghost" onClick={async () => { handleChangeView('listWeek'); setOpen(false); }} className="w-full flex justify-start">
-                <List className="mr-2 h-4 w-4" />Manage List
-              </Button>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek'); setOpen(false); }} className="w-full flex justify-start mb-8 lg:mb-4">
+                  <CalendarDays className="mr-2 h-4 w-4" />
+                  Manage Week
+                </Button>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                viewport={{ once: true }}
+              >
+                <Button variant="ghost" onClick={async () => { handleChangeView('dayGridMonth'); setOpen(false); }} className="w-full flex justify-start mb-8 lg:mb-4">
+                  <CalendarRange className="mr-2 h-4 w-4" />
+                  Manage Month
+                </Button>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <Button variant="ghost" onClick={async () => { handleChangeView('listWeek'); setOpen(false); }} className="w-full flex justify-start">
+                  <List className="mr-2 h-4 w-4" />Manage List
+                </Button>
+              </motion.div>
             </div>
           </SheetContent>
         </Sheet>
@@ -71,18 +93,32 @@ export default function Sidebar({ className, handleChangeView }: Props) {
 
               <h2 className="text-lg font-semibold mb-[-16px]">Project infos</h2>
               <div className="pt-8 space-y-4">
-                <Button variant="ghost" className="w-full flex justify-start">
-                  <a href="https://www.linkedin.com/in/taynan-hott/" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
-                    <Linkedin className="h-5 w-5" />
-                    <span>Linkedin</span>
-                  </a>
-                </Button>
-                <Button variant="ghost" className="w-full flex justify-start">
-                  <a href="https://github.com/taynanhott" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
-                    <Github className="h-5 w-5" />
-                    <span>Repository</span>
-                  </a>
-                </Button>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Button variant="ghost" className="w-full flex justify-start">
+                    <a href="https://www.linkedin.com/in/taynan-hott/" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                      <Linkedin className="h-5 w-5" />
+                      <span>Linkedin</span>
+                    </a>
+                  </Button>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                  viewport={{ once: true }}
+                >
+                  <Button variant="ghost" className="w-full flex justify-start">
+                    <a href="https://github.com/taynanhott" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                      <Github className="h-5 w-5" />
+                      <span>Repository</span>
+                    </a>
+                  </Button>
+                </motion.div>
               </div>
 
               <Button
