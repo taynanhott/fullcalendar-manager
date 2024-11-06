@@ -138,6 +138,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                         onChange={setColor}
                     />
                 </div>
+
                 {(!event && oneDay == 1) && (
                     <div className="flex items-center space-x-2">
                         <Switch

@@ -8,6 +8,7 @@ import { Home, LogOut, Menu, List, CalendarDays, CalendarRange, Github, Linkedin
 import Link from 'next/link'
 import { useUser } from "@/app/context/userContext";
 import Loading from "./loading";
+import Image from "next/image";
 
 interface Props {
   className?: string,
@@ -25,7 +26,7 @@ export default function Sidebar({ className, handleChangeView }: Props) {
       <nav className="flex items-center justify-around lg:justify-between bg-background p-4 shadow-md">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Menu" className="rounded-full">
+            <Button variant="ghost" size="icon" aria-label="Menu" className="w-[40px] h-[40px] rounded-full">
               <Menu className="h-6 w-6" />
             </Button>
           </SheetTrigger>
@@ -46,8 +47,11 @@ export default function Sidebar({ className, handleChangeView }: Props) {
             </div>
           </SheetContent>
         </Sheet>
-        <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden rounded-full" onClick={() => handleChangeView('dayGridMonth')}>
-          <Home className="h-6 w-6" />
+        <Button variant="ghost" size="icon" aria-label="Home" className="w-[130px] h-[40px] hidden lg:block rounded-full hover:bg-transparent" onClick={() => handleChangeView('dayGridMonth')}>
+          <Image src="/image/logo.png" width={130} height={40} alt="logo" />
+        </Button>
+        <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden rounded-full w-[40px] h-[40px] hover:bg-transparent" onClick={() => handleChangeView('dayGridMonth')}>
+          <Image src="/image/logo-ico.png" width={40} height={40} alt="logo" />
         </Button>
         <Sheet open={openAccount} onOpenChange={setOpenAccount}>
           <SheetTrigger asChild>
