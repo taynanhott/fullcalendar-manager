@@ -202,3 +202,25 @@ td .fc-day:hover {
     transform: translate(-25px, -25px) scale(1)
   }
 }
+
+@keyframes rotateCircle {
+  0% {
+    transform: rotate(0deg) translateX(10px) rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg) translateX(10px) rotate(-360deg);
+  }
+}
+
+@layer utilities {
+  .animate-float-slow {
+    animation: rotateCircle 10s linear infinite;
+    transform-origin: center;
+  }
+
+  .animate-float-fast {
+    animation: rotateCircle 7s linear infinite;
+    transform-origin: center;
+  }
+}

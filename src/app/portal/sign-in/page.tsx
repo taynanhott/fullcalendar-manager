@@ -6,9 +6,9 @@ export default function LoginPage() {
         <div className="flex items-center justify-center min-h-screen bg-white overflow-x-hidden">
             <div className="relative w-10/12 md:w-96 lg:w-96">
                 {/* Decorative circles */}
-                <div className="absolute -top-40 -left-40 w-72 h-72 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full opacity-50 overflow-x-hidden" />
-                <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-emerald-500 via-green-500 to-blue-300 rounded-full opacity-50 overflow-x-hidden" />
-
+                <div className="absolute -top-40 -left-40 w-72 h-72 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full opacity-50 overflow-x-hidden animate-float-slow" />
+                <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-emerald-500 via-green-500 to-blue-300 rounded-full opacity-50 overflow-x-hidden animate-float-fast" />
+                
                 {/* Login card */}
                 <div className="relative p-8 rounded-lg shadow-lg border-transparent border-2 backdrop-blur-md">
                     <span className="loader-logo block mx-auto mb-4"></span>
@@ -22,6 +22,6 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
-    
+
     );
 }
