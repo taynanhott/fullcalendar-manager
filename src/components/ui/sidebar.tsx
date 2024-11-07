@@ -31,7 +31,6 @@ export default function Sidebar({ className }: Props) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-
             <div className="flex flex-col h-full">
               <div className="pt-12 space-y-4">
                 <h2 className="text-lg font-semibold ">Menu</h2>
@@ -66,12 +65,12 @@ export default function Sidebar({ className }: Props) {
           </SheetContent>
         </Sheet>
         <Button variant="ghost" size="icon" aria-label="Home" className="w-[130px] h-[40px] hidden lg:block rounded-full hover:bg-transparent" onClick={() => { }}>
-          <a href="/calendar" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+          <a href="/calendar" target="_self" className="flex items-center space-x-2 rounded p-2">
             <Image src="/image/logo.png" width={130} height={40} alt="logo" />
           </a>
         </Button>
         <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden rounded-full w-[40px] h-[40px] hover:bg-transparent" onClick={() => { }}>
-          <a href="/calendar" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+          <a href="/calendar" target="_self" className="flex items-center space-x-2 rounded p-2">
             <Image src="/image/logo-ico.png" width={40} height={40} alt="logo" />
           </a>
         </Button>

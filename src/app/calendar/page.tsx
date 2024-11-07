@@ -13,7 +13,6 @@ import {
     SheetContent,
     SheetHeader,
     SheetTitle,
-    SheetDescription
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import ManageEventDialog from '@/components/ui/manage';
@@ -31,7 +30,7 @@ let height = 596;
 
 if (typeof window !== 'undefined') {
     small = window.innerWidth < 768;
-    height = window.innerHeight >= 740 ? 596: 531;
+    height = window.innerHeight >= 740 ? 596 : 531;
 }
 
 type SideOptions = 'left' | 'right' | 'bottom' | 'top';
@@ -114,8 +113,12 @@ export default function Calendar() {
             if (daysDiff == 1 && repeat > 1) {
                 if (typeRepeat == 'day') {
                     while (count < repeat) {
-                        const startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).format('YYYY-MM-DD') + start;
-                        const endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).format('YYYY-MM-DD') + end;
+                        let startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).format('YYYY-MM-DD') + start;
+                        let endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).format('YYYY-MM-DD') + end;
+
+                        if (moment(startDate).isAfter(moment(endDate))) {
+                            [startDate, endDate] = [endDate, startDate];
+                        }
 
                         const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
 
@@ -151,8 +154,12 @@ export default function Calendar() {
                 }
             } else {
                 while (count < daysDiff) {
-                    const startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
-                    const endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end;
+                    let startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
+                    let endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end;
+
+                    if (moment(startDate).isAfter(moment(endDate))) {
+                        [startDate, endDate] = [endDate, startDate];
+                    }
 
                     const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
 
@@ -175,8 +182,12 @@ export default function Calendar() {
 
     // Edit -----------------------------------------------------------
     const handleEventEdit = (eventEdit: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => {
-        const formattedStart = allDay ? moment(eventEdit.startStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + start;
-        const formattedEnd = allDay ? moment(eventEdit.endStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + end;
+        let formattedStart = allDay ? moment(eventEdit.startStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + start;
+        let formattedEnd = allDay ? moment(eventEdit.endStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + end;
+
+        if (moment(formattedStart).isAfter(moment(formattedEnd))) {
+            [formattedStart, formattedEnd] = [formattedEnd, formattedStart];
+        }
 
         setLoading(true);
         updateEvent(eventEdit.id, {
@@ -292,9 +303,6 @@ export default function Calendar() {
                     <SheetContent side={sheetSide}>
                         <SheetHeader>
                             <SheetTitle>New Event</SheetTitle>
-                            <SheetDescription>
-                                Enter the title for your event below.
-                            </SheetDescription>
                             <FormEvent handleEventCreate={handleEventCreate} selectedEventInfo={selectedEventInfo} />
                         </SheetHeader>
                     </SheetContent>

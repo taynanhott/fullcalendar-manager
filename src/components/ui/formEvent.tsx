@@ -8,6 +8,7 @@ import { DateSelectArg, EventApi } from "fullcalendar/index.js";
 import ColorSelector from "./color";
 import { RadioGroup, RadioGroupItem } from "./radio-group";
 import moment from "moment";
+import WeekDaySelector from "./selectDays";
 
 interface Props {
     event?: EventApi | null;
@@ -175,6 +176,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                                 </div>
                             </RadioGroup>
                         </div>
+                        <WeekDaySelector className="col-span-2" dayStart={selectedEventInfo?.start} />
                     </div>
                 )}
 
