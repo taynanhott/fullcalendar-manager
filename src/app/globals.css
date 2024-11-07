@@ -51,6 +51,10 @@ b {
   padding: 2em;
 }
 
+.fc-day-today {
+  background: #99c7ee !important;
+}
+
 .demo-app-main {
   flex-grow: 1;
   padding: 3em;
@@ -59,6 +63,7 @@ b {
 td .fc-day:hover {
   background-color: rgb(247, 233, 228) !important;
   cursor: pointer;
+  transition: background-color 0.8s ease;
 }
 
 .fc-toolbar-title {

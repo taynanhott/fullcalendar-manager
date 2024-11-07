@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Icon } from './icon'
-import { LogOut, Menu, CalendarDays, Github, Linkedin } from 'lucide-react'
+import { LogOut, Menu, CalendarDays, Github, Linkedin, LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from "@/app/context/userContext";
 import Loading from "./loading";
@@ -33,7 +33,7 @@ export default function Sidebar({ className }: Props) {
           <SheetContent side="left">
 
             <div className="flex flex-col h-full">
-              <div className="pt-36 lg:pt-12 space-y-4">
+              <div className="pt-12 space-y-4">
                 <h2 className="text-lg font-semibold ">Menu</h2>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -56,7 +56,7 @@ export default function Sidebar({ className }: Props) {
                 >
                   <Button variant="ghost" className="w-full flex justify-start">
                     <a href="/calendar/dashboard" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
-                      <CalendarDays className="h-5 w-5" />
+                      <LayoutDashboard className="h-5 w-5" />
                       <span>Dashboard</span>
                     </a>
                   </Button>
@@ -66,10 +66,14 @@ export default function Sidebar({ className }: Props) {
           </SheetContent>
         </Sheet>
         <Button variant="ghost" size="icon" aria-label="Home" className="w-[130px] h-[40px] hidden lg:block rounded-full hover:bg-transparent" onClick={() => { }}>
-          <Image src="/image/logo.png" width={130} height={40} alt="logo" />
+          <a href="/calendar" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+            <Image src="/image/logo.png" width={130} height={40} alt="logo" />
+          </a>
         </Button>
         <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden rounded-full w-[40px] h-[40px] hover:bg-transparent" onClick={() => { }}>
-          <Image src="/image/logo-ico.png" width={40} height={40} alt="logo" />
+          <a href="/calendar" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+            <Image src="/image/logo-ico.png" width={40} height={40} alt="logo" />
+          </a>
         </Button>
         <Sheet open={openAccount} onOpenChange={setOpenAccount}>
           <SheetTrigger asChild>

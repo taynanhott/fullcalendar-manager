@@ -15,9 +15,10 @@ export default function NavButton({ handleChangeView }: Props) {
                 transition={{ duration: 1, delay: 0.1 }}
                 viewport={{ once: true }}
             >
-                <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek') }} className="flex justify-start mb-8 lg:mb-4">
+                <Button variant="ghost" onClick={async () => { handleChangeView('dayGridWeek') }} className="flex justify-start">
                     <CalendarDays className="mr-2 h-4 w-4" />
                     <p className="hidden lg:flex">Manage Week</p>
+                    <p className="flex lg:hidden">Week</p>
                 </Button>
             </motion.div>
             <motion.div
@@ -26,9 +27,10 @@ export default function NavButton({ handleChangeView }: Props) {
                 transition={{ duration: 1, delay: 0.3 }}
                 viewport={{ once: true }}
             >
-                <Button variant="ghost" onClick={async () => { handleChangeView('dayGridMonth') }} className="flex justify-start mb-8 lg:mb-4">
+                <Button variant="ghost" onClick={async () => { handleChangeView('dayGridMonth') }} className="flex justify-start">
                     <CalendarRange className="mr-2 h-4 w-4" />
                     <p className="hidden lg:flex">Manage Month</p>
+                    <p className="flex lg:hidden">Month</p>
                 </Button>
             </motion.div>
             <motion.div
@@ -40,6 +42,7 @@ export default function NavButton({ handleChangeView }: Props) {
                 <Button variant="ghost" onClick={async () => { handleChangeView('listWeek') }} className="flex justify-start">
                     <List className="mr-2 h-4 w-4" />
                     <p className="hidden lg:flex">Manage List</p>
+                    <p className="flex lg:hidden">List</p>
                 </Button>
             </motion.div>
         </div>
