@@ -11,10 +11,10 @@ import moment from "moment";
 import WeekDaySelector from "./selectDays";
 
 interface Props {
-    event?: EventApi | null;
-    handleEventCreate?: (title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string) => void;
+    handleEventCreate?: ((title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string, daysWeek: number[]) => void) | undefined
     handleEventEdit?: (event: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => void;
-    selectedEventInfo?: DateSelectArg | null
+    selectedEventInfo?: DateSelectArg | null;
+    event?: EventApi | null;
 }
 
 export default function FormEvent({ handleEventCreate, handleEventEdit, selectedEventInfo, event }: Props) {
@@ -28,6 +28,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
     const [repeat, setRepeat] = useState(1);
     const [useRepeat, setUseRepeat] = useState(false);
     const [typeRepeat, setTypeRepeat] = useState('day');
+    const [daysWeek, setDaysWeek] = useState<number[]>([]);
 
     useEffect(() => {
         if (event) {
@@ -56,7 +57,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
         }, 3000);
     };
 
-    const validateForm = (title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string) => {
+    const validateForm = (title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string, daysWeek: number[]) => {
         if (!title || title.trim() === '') {
             showWarning();
             return false;
@@ -76,7 +77,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
         if (event && handleEventEdit) {
             handleEventEdit(event, title, start, end, allDay, color);
         } else if (handleEventCreate) {
-            handleEventCreate(title, start, end, allDay, color, repeat, typeRepeat);
+            handleEventCreate(title, start, end, allDay, color, repeat, typeRepeat, daysWeek);
         }
     };
 
@@ -87,7 +88,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                 const start = formatDateTime(startTime);
                 const end = formatDateTime(endTime);
 
-                validateForm(title, start, end, isAllDay, color, repeat, typeRepeat);
+                validateForm(title, start, end, isAllDay, color, repeat, typeRepeat, daysWeek);
             }}>
                 <div className="space-y-2 text-start">
                     <Label htmlFor="title">Event Title</Label>
@@ -140,7 +141,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                     />
                 </div>
 
-                {(!event && oneDay == 1) && (
+                {(!event && oneDay == 1) ? (
                     <div className="flex items-center space-x-2">
                         <Switch
                             id="all-day"
@@ -148,7 +149,8 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                             onCheckedChange={setUseRepeat}
                         />
                         <Label htmlFor="all-day">Recurring Event</Label>
-                    </div>)
+                    </div>) : !event &&
+                <WeekDaySelector daysWeek={daysWeek} setDaysWeek={setDaysWeek} className="col-span-2" selectedEventInfo={selectedEventInfo} />
                 }
 
                 {useRepeat && (
@@ -164,19 +166,12 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                             />
                         </div>
                         <div className="space-y-2 text-start">
-                            <Label htmlFor="type-repeat">Type of Repetition</Label>
-                            <RadioGroup defaultValue="day" onChange={(e: ChangeEvent<HTMLInputElement>) => setTypeRepeat(e.target.value)}>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="day" id="r1" />
-                                    <Label htmlFor="r1">Day</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="week" id="r2" />
-                                    <Label htmlFor="r2">Week</Label>
-                                </div>
-                            </RadioGroup>
+                            <Label htmlFor="type-repeat">Type</Label>
+                            <select defaultValue="week" className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 flex items-center space-x-2 h-10 rounded-md border border-input bg-background text-smrounded-md px-3 py-2 w-full" onChange={(e) => setTypeRepeat(e.target.value)}>
+                                <option value="day">day</option>
+                                <option value="week">week</option>
+                            </select>
                         </div>
-                        <WeekDaySelector className="col-span-2" dayStart={selectedEventInfo?.start} />
                     </div>
                 )}
 

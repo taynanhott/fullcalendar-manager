@@ -70,7 +70,6 @@ async function deleteEvent(eventId: string): Promise<void> {
 
   try {
     await set(eventRef, null);
-    console.log(`Evento ${eventId} deletado com sucesso.`);
   } catch (error) {
     console.error("Erro ao deletar evento:", error);
   }

@@ -98,10 +98,23 @@ export default function Calendar() {
     };
 
     // Create -----------------------------------------------------------
-    const handleEventCreate = async (title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string) => {
+    const handleEventCreate = async (
+        title: string,
+        start: string,
+        end: string,
+        allDay: boolean,
+        color: string,
+        repeat: number,
+        typeRepeat: string,
+        daysWeek: number[]
+    ) => {
         const calendarApi = selectedEventInfo?.view.calendar;
         const eventStart = selectedEventInfo?.start;
         const eventEnd = selectedEventInfo?.end;
+
+        const durationUnit = typeRepeat as moment.unitOfTime.DurationConstructor;
+
+        console.log(daysWeek);
 
         if (calendarApi && eventStart && eventEnd) {
             calendarApi.unselect();
@@ -110,56 +123,14 @@ export default function Calendar() {
             const daysDiff = allDay ? 1 : moment(eventEnd).diff(moment(eventStart), 'days');
 
             setLoading(true);
-            if (daysDiff == 1 && repeat > 1) {
-                if (typeRepeat == 'day') {
-                    while (count < repeat) {
-                        let startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).format('YYYY-MM-DD') + start;
-                        let endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).format('YYYY-MM-DD') + end;
-
-                        if (moment(startDate).isAfter(moment(endDate))) {
-                            [startDate, endDate] = [endDate, startDate];
-                        }
-
-                        const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
-
-                        calendarApi.addEvent({
-                            id,
-                            title,
-                            start: startDate,
-                            end: endDate,
-                            allDay,
-                            backgroundColor: color,
-                            borderColor: color
-                        });
-                        count++;
-                    }
-                } else if (typeRepeat == 'week') {
-                    while (count < repeat) {
-                        const startDate = allDay ? moment(eventStart).add(count, 'week').format('YYYY-MM-DD') : moment(eventStart).add(count, 'week').format('YYYY-MM-DD') + start;
-                        const endDate = allDay ? moment(eventEnd).add(count, 'week').format('YYYY-MM-DD') : moment(eventStart).add(count, 'week').format('YYYY-MM-DD') + end;
-
-                        const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
-
-                        calendarApi.addEvent({
-                            id,
-                            title,
-                            start: startDate,
-                            end: endDate,
-                            allDay,
-                            backgroundColor: color,
-                            borderColor: color
-                        });
-                        count++;
-                    }
-                }
-            } else {
-                while (count < daysDiff) {
-                    let startDate = allDay ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
-                    let endDate = allDay ? moment(eventEnd).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end;
-
-                    if (moment(startDate).isAfter(moment(endDate))) {
-                        [startDate, endDate] = [endDate, startDate];
-                    }
+            if (daysDiff === 1 && repeat > 1) {
+                while (count < repeat) {
+                    const startDate = allDay
+                        ? moment(eventStart).add(count, durationUnit).format('YYYY-MM-DD')
+                        : moment(eventStart).add(count, durationUnit).format('YYYY-MM-DD') + start;
+                    const endDate = allDay
+                        ? moment(eventEnd).add(count, durationUnit).format('YYYY-MM-DD')
+                        : moment(eventStart).add(count, durationUnit).format('YYYY-MM-DD') + end;
 
                     const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
 
@@ -170,8 +141,38 @@ export default function Calendar() {
                         end: endDate,
                         allDay,
                         backgroundColor: color,
-                        borderColor: color
+                        borderColor: color,
                     });
+                    count++;
+                }
+            } else {
+                while (count < daysDiff) {
+                    let startDate = allDay
+                        ? moment(eventStart).format('YYYY-MM-DD')
+                        : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
+                    let endDate = allDay
+                        ? moment(eventEnd).format('YYYY-MM-DD')
+                        : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end;
+
+                    if (moment(startDate).isAfter(moment(endDate))) {
+                        [startDate, endDate] = [endDate, startDate];
+                    }
+
+                    const dayOfWeek = moment(startDate).day();
+
+                    if (daysWeek.length === 0 || daysWeek.includes(dayOfWeek)) {
+                        const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
+
+                        calendarApi.addEvent({
+                            id,
+                            title,
+                            start: startDate,
+                            end: endDate,
+                            allDay,
+                            backgroundColor: color,
+                            borderColor: color,
+                        });
+                    }
                     count++;
                 }
             }
