@@ -248,7 +248,7 @@ export default function Dashboard() {
                     </Button>
                 </div>
             </div>
-            <div id="features-dashboard" className="mb-24 lg:mb-0 px-24">
+            <div id="features-dashboard" className="mb-24 lg:mb-0 px-0 lg:px-24">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-[38px]">
                     <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-white shadow-md">
                         <div className="col-span-1 items-center text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
