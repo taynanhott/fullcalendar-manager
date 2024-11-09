@@ -33,50 +33,48 @@ export default function WeekDaySelector({
 
     useEffect(() => {
         if (selectedEventInfo) {
-            const startDate = moment(selectedEventInfo.start).startOf('day'); // Início do dia
-            const endDate = moment(selectedEventInfo.end).endOf('day'); // Final do dia
+            const startDate = moment(selectedEventInfo.start).startOf('day');
+            const endDate = moment(selectedEventInfo.end).subtract(1, 'day').endOf('day');
 
             const newDaysInRange: number[] = [];
 
-            // Verificar os dias no intervalo, excluindo o último dia
             for (let date = moment(startDate); date.isBefore(endDate); date.add(1, 'days')) {
-                const dayIndex = date.day();  // Pega o índice do dia da semana
-                newDaysInRange.push(dayIndex); // Adiciona o índice ao array de dias válidos
+                const dayIndex = date.day();
+                newDaysInRange.push(dayIndex);
             }
 
-            setDaysInRange(newDaysInRange); // Atualiza os dias no intervalo
-            setDaysWeek(newDaysInRange); // Atualiza o estado do componente
+            setDaysInRange(newDaysInRange);
+            setDaysWeek(newDaysInRange);
         }
     }, [selectedEventInfo, setDaysWeek]);
 
     const handleDayToggle = (day: string) => {
-        const dayIndex = moment().day(day).day(); // Recupera o índice do dia
+        const dayIndex = moment().day(day).day();
 
         setDaysWeek(prev =>
             prev.includes(dayIndex)
-                ? prev.filter(d => d !== dayIndex) // Se estiver selecionado, remove
-                : [...prev, dayIndex] // Caso contrário, adiciona
+                ? prev.filter(d => d !== dayIndex)
+                : [...prev, dayIndex]
         );
     };
 
     return (
         <div className={`${className}`}>
             <div className="grid grid-cols-2 gap-2">
-                {daysOfWeek.map((day, index) => {
-                    const dayIndex = moment().day(day).day();  // Recupera o índice do dia atual
-                    const isLastDay = daysInRange[daysInRange.length - 1] === dayIndex; // Verifica se é o último dia
+                {daysOfWeek.map((day) => {
+                    const dayIndex = moment().day(day).day();
+                    const isLastDay = daysInRange[daysInRange.length] === dayIndex;
 
-                    // Não renderiza o último dia
                     if (isLastDay) {
                         return null;
                     }
 
                     return (
-                        daysInRange.includes(dayIndex) && (  // Só renderiza se o dia estiver no intervalo
+                        daysInRange.includes(dayIndex) && (
                             <div key={day} className="flex items-center space-x-2">
                                 <Checkbox
                                     id={day}
-                                    checked={daysWeek.includes(dayIndex)}  // Marca o checkbox se o dia estiver selecionado
+                                    checked={daysWeek.includes(dayIndex)}
                                     onCheckedChange={() => handleDayToggle(day)}
                                 />
                                 <Label htmlFor={day}>{day}</Label>

@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "./input";
 import { Label } from "./label";
 import { Switch } from "./switch";
@@ -6,7 +6,6 @@ import { Button } from "./button";
 import Alert from "./alert";
 import { DateSelectArg, EventApi } from "fullcalendar/index.js";
 import ColorSelector from "./color";
-import { RadioGroup, RadioGroupItem } from "./radio-group";
 import moment from "moment";
 import WeekDaySelector from "./selectDays";
 
@@ -27,7 +26,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
     const [oneDay] = useState(moment(selectedEventInfo?.end).diff(moment(selectedEventInfo?.start), 'days'));
     const [repeat, setRepeat] = useState(1);
     const [useRepeat, setUseRepeat] = useState(false);
-    const [typeRepeat, setTypeRepeat] = useState('day');
+    const [typeRepeat, setTypeRepeat] = useState('week');
     const [daysWeek, setDaysWeek] = useState<number[]>([]);
 
     useEffect(() => {

@@ -114,16 +114,16 @@ export default function Calendar() {
 
         const durationUnit = typeRepeat as moment.unitOfTime.DurationConstructor;
 
-        console.log(daysWeek);
-
         if (calendarApi && eventStart && eventEnd) {
             calendarApi.unselect();
 
             let count = 0;
-            const daysDiff = allDay ? 1 : moment(eventEnd).diff(moment(eventStart), 'days');
+            const daysDiff = moment(eventEnd).diff(moment(eventStart), 'days');
+            const looping = allDay ? daysWeek.length === daysDiff ? 1 : daysDiff : daysDiff;
+            const equal = daysWeek.length === daysDiff;
 
             setLoading(true);
-            if (daysDiff === 1 && repeat > 1) {
+            if (looping === 1) {
                 while (count < repeat) {
                     const startDate = allDay
                         ? moment(eventStart).add(count, durationUnit).format('YYYY-MM-DD')
@@ -146,12 +146,12 @@ export default function Calendar() {
                     count++;
                 }
             } else {
-                while (count < daysDiff) {
-                    let startDate = allDay
-                        ? moment(eventStart).format('YYYY-MM-DD')
+                while (count < looping) {
+                    let startDate = allDay ?
+                        equal ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD')
                         : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + start;
-                    let endDate = allDay
-                        ? moment(eventEnd).format('YYYY-MM-DD')
+                    let endDate = allDay ?
+                        equal ? moment(eventStart).format('YYYY-MM-DD') : moment(eventStart).add(count, 'days').format('YYYY-MM-DD')
                         : moment(eventStart).add(count, 'days').format('YYYY-MM-DD') + end;
 
                     if (moment(startDate).isAfter(moment(endDate))) {
