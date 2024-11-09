@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 interface Props {
+    className?: string;
     components: {
         options: {
             chart: {
@@ -58,13 +59,13 @@ interface Props {
     }[];
 }
 
-function Graph({ components }: Props) {
+function Graph({ className, components }: Props) {
     return (
         <>
             {components.map((component) => (
                 <Chart
                     key={component.options.chart.id}
-                    className={`w-full pt-4 px-4`}
+                    className={className}
                     options={component.options}
                     series={component.series}
                     type={component.options.chart.id}
