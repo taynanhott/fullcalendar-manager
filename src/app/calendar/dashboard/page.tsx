@@ -135,7 +135,7 @@ export default function Dashboard() {
             },
             series: [
                 {
-                    name: "Horas por dia",
+                    name: "Hours per day",
                     data: hoursData,
                 },
             ],
@@ -189,7 +189,7 @@ export default function Dashboard() {
             },
             series: [
                 {
-                    name: "Número de eventos por dia",
+                    name: "number of events per day",
                     data: eventsData,
                 },
             ],
@@ -252,13 +252,13 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-[38px]">
                     <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-white shadow-md">
                         <div className="col-span-1 items-center text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
-                            Event Hours of Days in Week
+                            Hours of events per week
                         </div>
                         <Graph className="max-w-3xl" components={simpleBarHour} />
                     </div>
                     <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400 shadow-md">
                         <div className="col-span-1 items-center text-lg text-white font-poppins-bold px-4 pt-4 pointer-events-none">
-                            % Event Hours of Week
+                            % Hours of events per week
                         </div>
                         <div className="bg-gradient-to-r">
                             <Graph className="max-w-3xl" components={simplePieChartHour} />
@@ -266,7 +266,7 @@ export default function Dashboard() {
                     </div>
                     <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400 shadow-md">
                         <div className="col-span-1 items-center text-lg text-white font-poppins-bold px-4 pt-4 pointer-events-none">
-                            % Event Number of Week
+                            % Number of Event per Week
                         </div>
                         <div className="bg-gradient-to-r">
                             <Graph className="max-w-3xl" components={simplePieChartNumber} />
@@ -274,7 +274,7 @@ export default function Dashboard() {
                     </div>
                     <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-white shadow-md">
                         <div className="col-span-1 items-center text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
-                            Event Number of Days in Week
+                            Number of Event per Week
                         </div>
                         <Graph className="max-w-3xl" components={simpleBarNumber} />
                     </div>
