@@ -270,7 +270,7 @@ export default function Dashboard() {
                         </div>
                         <Graph className="max-w-3xl" components={simpleBarHour} />
                     </div>
-                    <div className="h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite shadow-md">
+                    <div className="h-72 lg:h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite shadow-md">
                         <div className="col-span-1 items-center text-lg text-black font-poppins-bold px-4 pt-4 pointer-events-none">
                             % Hours of events per week
                         </div>
@@ -278,7 +278,7 @@ export default function Dashboard() {
                             <Graph className="mt-8 lg:mt-0 max-w-3xl" components={simplePieChartHour} />
                         </div>
                     </div>
-                    <div className="h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite">
+                    <div className="h-72 lg:h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite">
                         <div className="col-span-1 items-center text-lg text-black font-poppins-bold px-4 pt-4 pointer-events-none">
                             % Number of Event per Week
                         </div>
