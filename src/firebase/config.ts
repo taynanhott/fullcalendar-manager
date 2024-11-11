@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, set, get, push, query, orderByChild, equalTo } from 'firebase/database';
+import moment from "moment";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,6 +15,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+type Event = {
+  id: string;
+  userId: string;
+  title: string;
+  allDay: boolean;
+  color: string;
+  start: string;
+  end: string;
+};
 
 function writeEventData(title: string, start: string | Date, end: string | Date, allDay: boolean, color: string, userId: string) {
   const db = getDatabase();
@@ -33,7 +44,7 @@ function writeEventData(title: string, start: string | Date, end: string | Date,
   return newReference;
 }
 
-async function getEventsByUserId(userId: string): Promise<Event[]> {
+async function getEventsByUserId(userId: string, startDate: string, endDate: string): Promise<Event[]> {
   const db = getDatabase();
   const eventsRef = ref(db, "event");
 
@@ -44,7 +55,15 @@ async function getEventsByUserId(userId: string): Promise<Event[]> {
   if (snapshot.exists()) {
     snapshot.forEach((childSnapshot) => {
       const eventData = childSnapshot.val() as Event;
-      events.push(eventData);
+
+      const eventStart = moment(eventData.start);
+      const eventEnd = moment(eventData.end);
+      const startMoment = moment(startDate);
+      const endMoment = moment(endDate);
+
+      if ((eventStart.isBetween(startMoment, endMoment, 'day', '[]')) || (eventEnd.isBetween(startMoment, endMoment, 'day', '[]'))) {
+        events.push(eventData);
+      }
     });
   } else {
     console.log("Nenhum dado encontrado.");

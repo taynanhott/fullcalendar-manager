@@ -47,12 +47,15 @@ export default function Calendar() {
     const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
     const [toolbarConfig, setToolbarConfig] = useState({ left: 'prev,next', center: 'title', right: '' });
     const [events, setEvents] = useState<EventInput[]>([]);
+    const [rangeStart, setRangeStart] = useState(moment().startOf('month').format("YYYY-MM-DD"));
+    const [rangeEnd, setRangeEnd] = useState(moment().endOf('month').format("YYYY-MM-DD"));
 
     useEffect(() => {
-        const fetchEvents = async () => {
+        const fetchEvents = async (rangeStart: string, rangeEnd: string) => {
             setLoading(true);
             try {
-                const eventsData = await getEventsByUserId(user.uid);
+                const eventsData = await getEventsByUserId(user.uid, rangeStart, rangeEnd);
+                console.log(eventsData)
                 setEvents(eventsData);
                 setLoading(false);
             } catch (error) {
@@ -61,8 +64,8 @@ export default function Calendar() {
             }
         };
 
-        fetchEvents();
-    }, [user.uid]);
+        fetchEvents(rangeStart, rangeEnd);
+    }, [user.uid, rangeStart, rangeEnd]);
 
     // Other functions =======================================================================
     useEffect(() => {
@@ -281,6 +284,10 @@ export default function Calendar() {
                         eventDrop={(info) => handleResizeEventEdit(info.event)}
                         eventResize={(info) => handleResizeEventEdit(info.event)}
                         selectLongPressDelay={500}
+                        datesSet={(info) => {
+                            setRangeStart(moment(info.start).format("YYYY-MM-DD"));
+                            setRangeEnd(moment(info.end).format("YYYY-MM-DD"));
+                        }}
                     />
                 </motion.div>
 

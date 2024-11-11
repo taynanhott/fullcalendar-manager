@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import dynamic from "next/dynamic";
 
@@ -11,32 +9,40 @@ interface Props {
         options: {
             chart: {
                 id:
-                | "area"
-                | "line"
-                | "donut"
-                | "bar"
-                | "pie"
-                | "radialBar"
-                | "scatter"
-                | "bubble"
-                | "heatmap"
-                | "candlestick"
-                | "boxPlot"
-                | "radar"
-                | "polarArea"
-                | "rangeBar"
-                | "rangeArea"
-                | "treemap"
-                | undefined;
+                    | "area"
+                    | "line"
+                    | "donut"
+                    | "bar"
+                    | "pie"
+                    | "radialBar"
+                    | "scatter"
+                    | "bubble"
+                    | "heatmap"
+                    | "candlestick"
+                    | "boxPlot"
+                    | "radar"
+                    | "polarArea"
+                    | "rangeBar"
+                    | "rangeArea"
+                    | "treemap"
+                    | undefined;
                 foreColor?: string;
             };
             xaxis?: {
                 categories: string[];
             };
+            responsive?: {
+                breakpoint?: number;
+                options?: {
+                    legend?: {
+                        position?: "bottom" | "right";
+                    };
+                };
+            }[];
             labels?: string[];
             colors?: string[];
             legend?: {
-                position?: "bottom" | "left" | "right" | "top" | undefined;
+                position?: "bottom" | "left" | "right" | "top";
                 show?: boolean;
             };
             dataLabels?: {
@@ -50,11 +56,11 @@ interface Props {
             };
         };
         series:
-        | number[]
-        | {
-            name: string;
-            data: number[];
-        }[];
+            | number[]
+            | {
+                  name: string;
+                  data: number[];
+              }[];
         height?: number;
     }[];
 }

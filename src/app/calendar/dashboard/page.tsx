@@ -15,13 +15,15 @@ export default function Dashboard() {
     const { user } = useUser();
     const [loading, setLoading] = useState(false);
     const [events, setEvents] = useState<EventInput[]>([]);
-    const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf('month').add(2, 'days')); // Start at the 3rd of the month
+    const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf('month').add(2, 'days'));
+    const [rangeStart, setRangeStart] = useState(moment().startOf('month').format("YYYY-MM-DD"));
+    const [rangeEnd, setRangeEnd] = useState(moment().endOf('month').format("YYYY-MM-DD"));
 
     useEffect(() => {
-        const fetchEvents = async () => {
+        const fetchEvents = async (rangeStart: string, rangeEnd: string) => {
             setLoading(true);
             try {
-                const eventsData = await getEventsByUserId(user.uid);
+                const eventsData = await getEventsByUserId(user.uid, rangeStart, rangeEnd);
                 setEvents(eventsData);
                 setLoading(false);
             } catch (error) {
@@ -30,8 +32,13 @@ export default function Dashboard() {
             }
         };
 
-        fetchEvents();
-    }, [user.uid]);
+        fetchEvents(rangeStart, rangeEnd);
+    }, [user.uid, rangeStart, rangeEnd]);
+
+    useEffect(() => {
+        setRangeStart(currentWeekStart.clone().format("YYYY-MM-DD"));
+        setRangeEnd(currentWeekStart.clone().add(6, "days").format("YYYY-MM-DD"));
+    }, [currentWeekStart]);
 
     const getWeekDateRange = () => {
         const startOfWeek = currentWeekStart.clone();
@@ -50,7 +57,7 @@ export default function Dashboard() {
     const generateDynamicLabels = () => {
         const { startOfWeek, endOfWeek } = getWeekDateRange();
         const labels = [];
-        const currentDay = moment(startOfWeek);  // Use const here
+        const currentDay = moment(startOfWeek);
         while (currentDay.isSameOrBefore(endOfWeek)) {
             labels.push(currentDay.format("DD/MM"));
             currentDay.add(1, "day");
@@ -61,7 +68,7 @@ export default function Dashboard() {
     const generateWeekdaysLabels = () => {
         const { startOfWeek } = getWeekDateRange();
         const labels = [];
-        const currentDay = moment(startOfWeek);  // Use const here
+        const currentDay = moment(startOfWeek);
         while (labels.length < 7) {
             labels.push(currentDay.format("dddd"));
             currentDay.add(1, "day");
@@ -83,7 +90,7 @@ export default function Dashboard() {
                 if (!hoursPerDay[dayOfEvent]) {
                     hoursPerDay[dayOfEvent] = 0;
                 }
-                hoursPerDay[dayOfEvent] += duration;
+                hoursPerDay[dayOfEvent] += +duration.toFixed(2);
             }
         });
         return hoursPerDay;
@@ -100,8 +107,10 @@ export default function Dashboard() {
             if (!eventsPerDay[dayOfEvent]) {
                 eventsPerDay[dayOfEvent] = 0;
             }
-            eventsPerDay[dayOfEvent] += 1;
+
+            eventsPerDay[dayOfEvent] = Math.floor(eventsPerDay[dayOfEvent]) + 1;
         });
+
         return eventsPerDay;
     };
 
@@ -114,7 +123,7 @@ export default function Dashboard() {
             options: {
                 chart: {
                     id: "bar" as const,
-                    foreColor: "#000000",
+                    foreColor: "#FFFFFF",
                 },
                 xaxis: {
                     categories: labels,
@@ -125,21 +134,23 @@ export default function Dashboard() {
                 fill: {
                     colors: ["#2c3e50"],
                 },
-                colors: ["#000000"],
+                colors: ["#FFFFFF"],
                 dataLabels: {
                     enabled: false,
-                    formatter: function (val: number) {
-                        return val.toFixed(2);
-                    },
                 },
             },
             series: [
                 {
                     name: "Hours per day",
-                    data: hoursData,
+                    data: hoursData.map(hour => {
+                        const hours = Math.floor(hour);
+                        const decimalMinutes = (hour - hours) * 60;
+                        const decimal = hours + decimalMinutes / 100;
+                        return parseFloat(decimal.toFixed(2));
+                    }),
                 },
             ],
-            height: 240,
+            height: 185,
         },
     ];
 
@@ -151,24 +162,30 @@ export default function Dashboard() {
                 },
                 labels: generateWeekdaysLabels(),
                 legend: {
-                    position: "bottom" as const,
+                    position: "right" as const,
                     labels: {
-                        colors: "#FFFFFF",
+                        colors: "#000000",
                     },
                 },
-                colors: ["#FF6F61", "#6B8E23", "#1E90FF", "#FFD700", "#8A2BE2", "#00CED1", "#FF8C00"],
+                colors: ["#67C7D1", "#5E9B3A", "#2A8BCE", "#F1A40D", "#B24E88", "#39A8A0", "#E57E17"],
             },
-            series: hoursData,
-            height: 260,
+            series: hoursData.map(hour => {
+                const hours = Math.floor(hour);
+                const decimalMinutes = (hour - hours) * 60;
+                const decimal = hours + decimalMinutes / 100;
+                return parseFloat(decimal.toFixed(2));
+            }),
+            height: 185,
         },
     ];
+
 
     const simpleBarNumber = [
         {
             options: {
                 chart: {
                     id: "bar" as const,
-                    foreColor: "#000000",
+                    foreColor: "#FFFFFF",
                 },
                 xaxis: {
                     categories: labels,
@@ -179,21 +196,18 @@ export default function Dashboard() {
                 fill: {
                     colors: ["#2c3e50"],
                 },
-                colors: ["#000000"],
+                colors: ["#2c3e50"],
                 dataLabels: {
                     enabled: false,
-                    formatter: function (val: number) {
-                        return val.toFixed(0);
-                    },
                 },
             },
             series: [
                 {
                     name: "number of events per day",
-                    data: eventsData,
+                    data: eventsData.map(event => Math.round(event)),
                 },
             ],
-            height: 240,
+            height: 185,
         },
     ];
 
@@ -205,16 +219,16 @@ export default function Dashboard() {
                 },
                 labels: generateWeekdaysLabels(),
                 legend: {
-                    position: "bottom" as const,
+                    position: "right" as const,
                     labels: {
-                        colors: "#FFFFFF",
+                        colors: "#000000",
                     },
                 },
-                colors: ["#FF6F61", "#6B8E23", "#1E90FF", "#FFD700", "#8A2BE2", "#00CED1", "#FF8C00"],
+                colors: ["#67C7D1", "#5E9B3A", "#2A8BCE", "#F1A40D", "#B24E88", "#39A8A0", "#E57E17"],
             },
             series: eventsData,
-            height: 260,
-        },
+            height: 185,
+        }
     ];
 
     const goToPreviousWeek = () => {
@@ -249,31 +263,31 @@ export default function Dashboard() {
                 </div>
             </div>
             <div id="features-dashboard" className="mb-24 lg:mb-0 px-0 lg:px-24">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-[38px]">
-                    <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-white shadow-md">
-                        <div className="col-span-1 items-center text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 px-[38px]">
+                    <div className="h-60 col-span-1 lg:col-span-3 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400  shadow-md">
+                        <div className="col-span-1 items-center text-white text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
                             Hours of events per week
                         </div>
                         <Graph className="max-w-3xl" components={simpleBarHour} />
                     </div>
-                    <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400 shadow-md">
-                        <div className="col-span-1 items-center text-lg text-white font-poppins-bold px-4 pt-4 pointer-events-none">
+                    <div className="h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite shadow-md">
+                        <div className="col-span-1 items-center text-lg text-black font-poppins-bold px-4 pt-4 pointer-events-none">
                             % Hours of events per week
                         </div>
                         <div className="bg-gradient-to-r">
-                            <Graph className="max-w-3xl" components={simplePieChartHour} />
+                            <Graph className="mt-8 lg:mt-0 max-w-3xl" components={simplePieChartHour} />
                         </div>
                     </div>
-                    <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400 shadow-md">
-                        <div className="col-span-1 items-center text-lg text-white font-poppins-bold px-4 pt-4 pointer-events-none">
+                    <div className="h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite">
+                        <div className="col-span-1 items-center text-lg text-black font-poppins-bold px-4 pt-4 pointer-events-none">
                             % Number of Event per Week
                         </div>
                         <div className="bg-gradient-to-r">
-                            <Graph className="max-w-3xl" components={simplePieChartNumber} />
+                            <Graph className="mt-8 lg:mt-0 max-w-3xl" components={simplePieChartNumber} />
                         </div>
                     </div>
-                    <div className="h-72 col-span-2 lg:col-span-1 rounded-sm border bg-white shadow-md">
-                        <div className="col-span-1 items-center text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
+                    <div className="h-60 col-span-1 lg:col-span-3 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400 shadow-md">
+                        <div className="col-span-1 items-center text-white text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
                             Number of Event per Week
                         </div>
                         <Graph className="max-w-3xl" components={simpleBarNumber} />
