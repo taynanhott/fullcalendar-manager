@@ -265,13 +265,13 @@ export default function Dashboard() {
             </div>
             <div id="features-dashboard" className="mb-24 lg:mb-0 px-0 lg:px-24">
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 px-[38px]">
-                    <div className="h-60 col-span-1 lg:col-span-3 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400  shadow-md">
+                    <div className="h-60 col-span-1 lg:col-span-3 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400  shadow-lg">
                         <div className="col-span-1 items-center text-white text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
                             Hours of events per week
                         </div>
                         <Graph className="max-w-3xl" components={simpleBarHour} />
                     </div>
-                    <div className="h-72 lg:h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite shadow-md">
+                    <div className="h-72 lg:h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite shadow-lg">
                         <div className="col-span-1 items-center text-lg text-black font-poppins-bold px-4 pt-4 pointer-events-none">
                             % Hours of events per week
                         </div>
@@ -279,7 +279,7 @@ export default function Dashboard() {
                             <Graph className="mt-8 lg:mt-0 max-w-3xl" components={simplePieChartHour} />
                         </div>
                     </div>
-                    <div className="h-72 lg:h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite shadow-md">
+                    <div className="h-72 lg:h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite shadow-lg">
                         <div className="col-span-1 items-center text-lg text-black font-poppins-bold px-4 pt-4 pointer-events-none">
                             % Number of Event per Week
                         </div>
@@ -287,7 +287,7 @@ export default function Dashboard() {
                             <Graph className="mt-8 lg:mt-0 max-w-3xl" components={simplePieChartNumber} />
                         </div>
                     </div>
-                    <div className="h-60 col-span-1 lg:col-span-3 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400 shadow-md">
+                    <div className="h-60 col-span-1 lg:col-span-3 rounded-sm border bg-gradient-to-r from-slate-500 to-slate-400 shadow-lg">
                         <div className="col-span-1 items-center text-white text-lg font-poppins-bold px-4 pt-4 pointer-events-none">
                             Number of Event per Week
                         </div>

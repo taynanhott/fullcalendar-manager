@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Icon } from './icon'
-import { LogOut, Menu, CalendarDays, Github, Linkedin, LayoutDashboard } from 'lucide-react'
+import { LogOut, Menu, CalendarDays, Github, Linkedin, LayoutDashboard, Wallet } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from "@/app/context/userContext";
 import Loading from "./loading";
@@ -23,10 +23,10 @@ export default function Sidebar({ className }: Props) {
 
   return (
     <div className={`${className} fixed bottom-0 lg:bottom-auto top-auto lg:top-0 left-0 right-0 z-30`}>
-      <nav className="flex h-16 items-center justify-around lg:justify-between bg-background p-4 shadow-md">
+      <nav className="flex h-14 items-center justify-around lg:justify-between bg-background p-4 shadow-lg">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Menu" className="w-[40px] h-[40px] rounded-full">
+            <Button variant="ghost" size="icon" aria-label="Menu" className="w-[40px] h-[40px] rounded-full bg-gray-200">
               <Menu className="h-6 w-6" />
             </Button>
           </SheetTrigger>
@@ -60,12 +60,25 @@ export default function Sidebar({ className }: Props) {
                     </a>
                   </Button>
                 </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                  viewport={{ once: true }}
+                >
+                  <Button variant="ghost" className="w-full flex justify-start">
+                    <a href="https://financial.taynan.dev/" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                      <Wallet className="h-5 w-5" />
+                      <span>Financial Manager</span>
+                    </a>
+                  </Button>
+                </motion.div>
               </div>
             </div>
           </SheetContent>
         </Sheet>
-        <Button variant="ghost" size="icon" aria-label="Home" className="w-[130px] h-[40px] hidden lg:block rounded-full hover:bg-transparent" onClick={() => { }}>
-          <a href="/calendar" target="_self" className="flex items-center space-x-2 rounded p-2">
+        <Button variant="ghost" size="icon" aria-label="Home" className="w-[130px] hidden lg:block rounded-full hover:bg-transparent" onClick={() => { }}>
+          <a href="/calendar" target="_self" className="flex items-center mx-auto space-x-2 rounded">
             <Image src="/image/logo.png" width={130} height={40} alt="logo" />
           </a>
         </Button>

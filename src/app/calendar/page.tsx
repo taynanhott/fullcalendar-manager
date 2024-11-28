@@ -36,7 +36,7 @@ if (typeof window !== 'undefined') {
 
     small = width < 768;
 
-    const percent = small ? 0.85 : 0.82;
+    const percent = small ? 0.84 : 0.82;
 
     height = Math.round(screenHeight * percent);
 }
@@ -271,7 +271,7 @@ export default function Calendar() {
 
     return (
         <div>
-            <div className="px-4 py-2 lg:py-4 mt-0 lg:mt-14">
+            <div className="px-4 py-2 mt-0 lg:mt-14">
                 {/* =================================== Calendar =============================================== */}
                 <NavButton handleChangeView={handleChangeView} />
                 <motion.div
