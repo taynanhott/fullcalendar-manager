@@ -1,4 +1,6 @@
+import { AlertTriangle } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
+
 import {
   Dialog,
   DialogContent,
@@ -6,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { AlertTriangle } from "lucide-react";
 
 interface RemoveEventDialogProps {
   isOpen: boolean;

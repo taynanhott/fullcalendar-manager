@@ -1,12 +1,24 @@
 "use client";
 
+import moment from 'moment';
+import { motion } from "framer-motion";
+import { Button } from '@/components/ui/button';
+import { useUser } from '../context/userContext';
+import { useState, useEffect, useRef } from 'react';
 import { DateSelectArg, EventApi, EventInput } from '@fullcalendar/core';
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
+import { deleteEvent, getEventsByUserId, updateEvent, writeEventData } from '@/firebase/config';
+
+import listPlugin from '@fullcalendar/list';
+import Sidebar from '@/components/ui/sidebar';
+import Loading from '@/components/ui/loading';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import NavButton from '@/components/ui/navButton';
+import FormEvent from '@/components/ui/formEvent';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import listPlugin from '@fullcalendar/list';
-import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
-import { useState, useEffect, useRef } from 'react';
+import ManageEventDialog from '@/components/ui/manage';
+
 import {
     Sheet,
     SheetTrigger,
@@ -14,41 +26,37 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import ManageEventDialog from '@/components/ui/manage';
-import moment from 'moment';
-import Sidebar from '@/components/ui/sidebar';
-import FormEvent from '@/components/ui/formEvent';
-import { deleteEvent, getEventsByUserId, updateEvent, writeEventData } from '@/firebase/config';
-import { useUser } from '../context/userContext';
-import Loading from '@/components/ui/loading';
-import { motion } from "framer-motion";
-import NavButton from '@/components/ui/navButton';
 
 let small = false;
-let height = 596;
+let height = 0;
 
 if (typeof window !== 'undefined') {
-    small = window.innerWidth < 768;
-    height = window.innerHeight >= 740 ? 596 : 531;
+    const width = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    small = width < 768;
+
+    const percent = small ? 0.85 : 0.82;
+
+    height = Math.round(screenHeight * percent);
 }
 
 type SideOptions = 'left' | 'right' | 'bottom' | 'top';
 
 export default function Calendar() {
     const { user } = useUser();
-    const calendarRef = useRef<FullCalendar>(null);
     const [loading, setLoading] = useState(false);
-    const [isDateSelectActive, setIsDateSelectActive] = useState(false);
-    const [isSheetOpen, setIsSheetOpen] = useState(false);
-    const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
-    const [sheetSide, setSheetSide] = useState<SideOptions>('bottom');
+    const calendarRef = useRef<FullCalendar>(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
-    const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
-    const [toolbarConfig, setToolbarConfig] = useState({ left: 'prev,next', center: 'title', right: '' });
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [events, setEvents] = useState<EventInput[]>([]);
-    const [rangeStart, setRangeStart] = useState(moment().startOf('month').format("YYYY-MM-DD"));
+    const [sheetSide, setSheetSide] = useState<SideOptions>('bottom');
+    const [isDateSelectActive, setIsDateSelectActive] = useState(false);
+    const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
+    const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
     const [rangeEnd, setRangeEnd] = useState(moment().endOf('month').format("YYYY-MM-DD"));
+    const [rangeStart, setRangeStart] = useState(moment().startOf('month').format("YYYY-MM-DD"));
+    const [toolbarConfig, setToolbarConfig] = useState({ left: 'prev,next', center: 'title', right: '' });
 
     useEffect(() => {
         const fetchEvents = async (rangeStart: string, rangeEnd: string) => {
@@ -252,13 +260,21 @@ export default function Calendar() {
         });
     };
 
+    const getResponsiveView = () => {
+        if (typeof window !== 'undefined') {
+            if (window.innerWidth < 768) {
+                return 'listWeek';
+            }
+        }
+        return 'dayGridMonth';
+    };
+
     return (
         <div>
-            <div className="p-4 mt-0 lg:mt-20">
+            <div className="px-4 py-2 lg:py-4 mt-0 lg:mt-14">
                 {/* =================================== Calendar =============================================== */}
                 <NavButton handleChangeView={handleChangeView} />
                 <motion.div
-                    className="mt-2"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 1 }}
@@ -274,9 +290,10 @@ export default function Calendar() {
                             },
                         }}
                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-                        initialView="dayGridMonth"
+                        initialView={getResponsiveView()}
                         events={events}
                         editable={true}
+                        dayMaxEventRows={2}
                         selectable={true}
                         select={handleDateSelect}
                         dateClick={handleDateClick}

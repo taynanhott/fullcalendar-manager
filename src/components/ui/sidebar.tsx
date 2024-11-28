@@ -23,7 +23,7 @@ export default function Sidebar({ className }: Props) {
 
   return (
     <div className={`${className} fixed bottom-0 lg:bottom-auto top-auto lg:top-0 left-0 right-0 z-30`}>
-      <nav className="flex items-center justify-around lg:justify-between bg-background p-4 shadow-md">
+      <nav className="flex h-16 items-center justify-around lg:justify-between bg-background p-4 shadow-md">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" aria-label="Menu" className="w-[40px] h-[40px] rounded-full">

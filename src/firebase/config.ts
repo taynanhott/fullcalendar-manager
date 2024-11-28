@@ -1,6 +1,8 @@
-import { initializeApp } from "firebase/app";
+
 import { getAuth } from "firebase/auth";
+import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, get, push, query, orderByChild, equalTo } from 'firebase/database';
+
 import moment from "moment";
 
 const firebaseConfig = {

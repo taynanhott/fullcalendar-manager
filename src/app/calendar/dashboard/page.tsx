@@ -1,23 +1,24 @@
 "use client"
 
-import { useUser } from "@/app/context/userContext";
-import Graph from "@/components/graph/graph";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { EventInput } from "fullcalendar/index.js";
+import { useUser } from "@/app/context/userContext";
+import { getEventsByUserId } from "@/firebase/config";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import moment from "moment";
+import Graph from "@/components/graph/graph";
 import Loading from "@/components/ui/loading";
 import Sidebar from "@/components/ui/sidebar";
-import { getEventsByUserId } from "@/firebase/config";
-import { EventInput } from "fullcalendar/index.js";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import moment from "moment";
-import { useEffect, useState } from "react";
 
 export default function Dashboard() {
     const { user } = useUser();
     const [loading, setLoading] = useState(false);
     const [events, setEvents] = useState<EventInput[]>([]);
-    const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf('month').add(2, 'days'));
-    const [rangeStart, setRangeStart] = useState(moment().startOf('month').format("YYYY-MM-DD"));
     const [rangeEnd, setRangeEnd] = useState(moment().endOf('month').format("YYYY-MM-DD"));
+    const [rangeStart, setRangeStart] = useState(moment().startOf('month').format("YYYY-MM-DD"));
+    const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf('month').add(2, 'days'));
 
     useEffect(() => {
         const fetchEvents = async (rangeStart: string, rangeEnd: string) => {
@@ -278,7 +279,7 @@ export default function Dashboard() {
                             <Graph className="mt-8 lg:mt-0 max-w-3xl" components={simplePieChartHour} />
                         </div>
                     </div>
-                    <div className="h-72 lg:h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite">
+                    <div className="h-72 lg:h-60 col-span-1 lg:col-span-2 rounded-sm border bg-wite shadow-md">
                         <div className="col-span-1 items-center text-lg text-black font-poppins-bold px-4 pt-4 pointer-events-none">
                             % Number of Event per Week
                         </div>
