@@ -23,15 +23,18 @@ type Event = {
   userId: string;
   title: string;
   allDay: boolean;
+  finish: boolean;
   color: string;
   start: string;
   end: string;
 };
 
-function writeEventData(title: string, start: string | Date, end: string | Date, allDay: boolean, color: string, userId: string) {
+function writeEventData(title: string, start: string | Date, end: string | Date, allDay: boolean, finish: boolean = false, color: string, userId: string) {
   const db = getDatabase();
   const reference = ref(db, 'event/');
   const newReference = push(reference);
+
+  const colorCode = allDay ? color : (finish ? '#3ad737' : '#e63333');
 
   set(newReference, {
     id: newReference.key,
@@ -39,7 +42,8 @@ function writeEventData(title: string, start: string | Date, end: string | Date,
     start: start,
     end: end,
     allDay: allDay,
-    color: color,
+    finish: finish,
+    color: colorCode,
     userId: userId
   })
 
@@ -74,7 +78,7 @@ async function getEventsByUserId(userId: string, startDate: string, endDate: str
   return events;
 }
 
-async function updateEvent(eventId: string, updatedData: { id: string, title: string; start: string | Date; end: string | Date; allDay: boolean; color: string; userId: string }): Promise<void> {
+async function updateEvent(eventId: string, updatedData: { id: string, title: string; start: string | Date; end: string | Date; allDay: boolean, finish: boolean; color: string; userId: string }): Promise<void> {
   const db = getDatabase();
   const eventRef = ref(db, `event/${eventId}`);
 

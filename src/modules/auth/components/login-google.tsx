@@ -33,6 +33,7 @@ export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
             const result: UserCredential = await signInWithPopup(auth, provider);
 
             if (result) {
+                console.log(result);
                 const userInfo: UserProps = {
                     uid: result.user.uid,
                     displayName: result.user.displayName ?? '',
@@ -72,7 +73,7 @@ export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
                 <Button
                     className="flex shadow-lg w-10/12 border-gray-400 border-opacity-35 justify-center bg-transparent mx-auto backdrop-blur-3xl hover:bg-white/30 hover:scale-110 transition-all duration-300"
                     variant="outline">
-                        Waiting for login...
+                    Waiting for login...
                 </Button>}
         </>
     )

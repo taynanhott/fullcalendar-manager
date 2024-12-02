@@ -10,24 +10,25 @@ import moment from "moment";
 import WeekDaySelector from "./selectDays";
 
 interface Props {
-    handleEventCreate?: ((title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string, daysWeek: number[]) => void) | undefined
-    handleEventEdit?: (event: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => void;
+    handleEventCreate?: ((title: string, start: string, end: string, allDay: boolean, finish: boolean, color: string, repeat: number, typeRepeat: string, daysWeek: number[]) => void) | undefined
+    handleEventEdit?: (event: EventApi, title: string, start: string, end: string, allDay: boolean, finish: boolean, color: string) => void;
     selectedEventInfo?: DateSelectArg | null;
     event?: EventApi | null;
 }
 
 export default function FormEvent({ handleEventCreate, handleEventEdit, selectedEventInfo, event }: Props) {
-    const [isAllDay, setIsAllDay] = useState(false);
     const [title, setTitle] = useState('');
-    const [startTime, setStartTime] = useState('');
+    const [repeat, setRepeat] = useState(1);
     const [endTime, setEndTime] = useState('');
     const [isOpen, setIsOpen] = useState(false);
+    const [finish, setFinish] = useState(false);
     const [color, setColor] = useState('#3788d8');
-    const [oneDay] = useState(moment(selectedEventInfo?.end).diff(moment(selectedEventInfo?.start), 'days'));
-    const [repeat, setRepeat] = useState(1);
+    const [startTime, setStartTime] = useState('');
+    const [isAllDay, setIsAllDay] = useState(false);
     const [useRepeat, setUseRepeat] = useState(false);
     const [typeRepeat, setTypeRepeat] = useState('week');
     const [daysWeek, setDaysWeek] = useState<number[]>([]);
+    const [oneDay] = useState(moment(selectedEventInfo?.end).diff(moment(selectedEventInfo?.start), 'days'));
 
     useEffect(() => {
         if (event) {
@@ -41,6 +42,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                 setEndTime(end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
             }
             setIsAllDay(event.allDay);
+            setFinish(event.extendedProps.finish);
             setColor(event.backgroundColor);
         }
     }, [event]);
@@ -56,7 +58,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
         }, 3000);
     };
 
-    const validateForm = (title: string, start: string, end: string, allDay: boolean, color: string, repeat: number, typeRepeat: string, daysWeek: number[]) => {
+    const validateForm = (title: string, start: string, end: string, allDay: boolean, finish: boolean, color: string, repeat: number, typeRepeat: string, daysWeek: number[]) => {
         if (!title || title.trim() === '') {
             showWarning();
             return false;
@@ -74,9 +76,9 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
         }
 
         if (event && handleEventEdit) {
-            handleEventEdit(event, title, start, end, allDay, color);
+            handleEventEdit(event, title, start, end, allDay, finish, color);
         } else if (handleEventCreate) {
-            handleEventCreate(title, start, end, allDay, color, repeat, typeRepeat, daysWeek);
+            handleEventCreate(title, start, end, allDay, finish, color, repeat, typeRepeat, daysWeek);
         }
     };
 
@@ -87,7 +89,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                 const start = formatDateTime(startTime);
                 const end = formatDateTime(endTime);
 
-                validateForm(title, start, end, isAllDay, color, repeat, typeRepeat, daysWeek);
+                validateForm(title, start, end, isAllDay, finish, color, repeat, typeRepeat, daysWeek);
             }}>
                 <div className="space-y-2 text-start">
                     <Label htmlFor="title">Event Title</Label>
@@ -101,15 +103,15 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                 </div>
 
                 <div className="flex items-center space-x-2">
+                    <Label htmlFor="all-day">Event during all-day</Label>
                     <Switch
                         id="all-day"
                         checked={isAllDay}
                         onCheckedChange={setIsAllDay}
                     />
-                    <Label htmlFor="all-day">Event during all-day</Label>
                 </div>
 
-                {!isAllDay && (
+                {!isAllDay ? (
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2 text-start">
                             <Label htmlFor="start-time">Start hour</Label>
@@ -129,25 +131,33 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                                 onChange={(e) => setEndTime(e.target.value)}
                             />
                         </div>
+                        <div className="flex items-center space-x-2">
+                            <Label htmlFor="all-day">Finished</Label>
+                            <Switch
+                                id="finish"
+                                checked={finish}
+                                onCheckedChange={setFinish}
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex items-center space-x-2">
+                        <Label htmlFor="repeat-count">Select an color</Label>
+                        <ColorSelector
+                            value={color}
+                            onChange={setColor}
+                        />
                     </div>
                 )}
 
-                <div className="flex items-center space-x-2">
-                    <Label htmlFor="repeat-count">Select an color</Label>
-                    <ColorSelector
-                        value={color}
-                        onChange={setColor}
-                    />
-                </div>
-
                 {(!event && oneDay == 1) ? (
                     <div className="flex items-center space-x-2">
+                        <Label htmlFor="all-day">Recurring Event</Label>
                         <Switch
                             id="all-day"
                             checked={useRepeat}
                             onCheckedChange={setUseRepeat}
                         />
-                        <Label htmlFor="all-day">Recurring Event</Label>
                     </div>) : !event &&
                 <WeekDaySelector daysWeek={daysWeek} setDaysWeek={setDaysWeek} className="col-span-2" selectedEventInfo={selectedEventInfo} />
                 }

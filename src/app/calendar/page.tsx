@@ -114,6 +114,7 @@ export default function Calendar() {
         start: string,
         end: string,
         allDay: boolean,
+        finish: boolean,
         color: string,
         repeat: number,
         typeRepeat: string,
@@ -132,6 +133,7 @@ export default function Calendar() {
             const daysDiff = moment(eventEnd).diff(moment(eventStart), 'days');
             const looping = allDay ? daysWeek.length === daysDiff ? 1 : daysDiff : daysDiff;
             const equal = daysWeek.length === daysDiff;
+            const colorCode = !allDay ? finish ? '#3ad737' : '#e63333' : color;
 
             setLoading(true);
             if (looping === 1) {
@@ -143,7 +145,7 @@ export default function Calendar() {
                         ? moment(eventEnd).add(count, durationUnit).format('YYYY-MM-DD')
                         : moment(eventStart).add(count, durationUnit).format('YYYY-MM-DD') + end;
 
-                    const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
+                    const id = (await writeEventData(title, startDate, endDate, allDay, finish, color, user.uid)).key ?? '';
 
                     calendarApi.addEvent({
                         id,
@@ -151,8 +153,9 @@ export default function Calendar() {
                         start: startDate,
                         end: endDate,
                         allDay,
-                        backgroundColor: color,
-                        borderColor: color,
+                        finish,
+                        backgroundColor: colorCode,
+                        borderColor: colorCode,
                     });
                     count++;
                 }
@@ -172,7 +175,7 @@ export default function Calendar() {
                     const dayOfWeek = moment(startDate).day();
 
                     if (daysWeek.length === 0 || daysWeek.includes(dayOfWeek)) {
-                        const id = (await writeEventData(title, startDate, endDate, allDay, color, user.uid)).key ?? '';
+                        const id = (await writeEventData(title, startDate, endDate, allDay, finish, color, user.uid)).key ?? '';
 
                         calendarApi.addEvent({
                             id,
@@ -180,8 +183,9 @@ export default function Calendar() {
                             start: startDate,
                             end: endDate,
                             allDay,
-                            backgroundColor: color,
-                            borderColor: color,
+                            finish,
+                            backgroundColor: colorCode,
+                            borderColor: colorCode,
                         });
                     }
                     count++;
@@ -193,9 +197,10 @@ export default function Calendar() {
     };
 
     // Edit -----------------------------------------------------------
-    const handleEventEdit = (eventEdit: EventApi, title: string, start: string, end: string, allDay: boolean, color: string) => {
+    const handleEventEdit = (eventEdit: EventApi, title: string, start: string, end: string, allDay: boolean, finish: boolean, color: string) => {
         let formattedStart = allDay ? moment(eventEdit.startStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + start;
         let formattedEnd = allDay ? moment(eventEdit.endStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + end;
+        const colorCode = !allDay ? finish ? '#3ad737' : '#e63333' : color;
 
         if (moment(formattedStart).isAfter(moment(formattedEnd))) {
             [formattedStart, formattedEnd] = [formattedEnd, formattedStart];
@@ -208,15 +213,17 @@ export default function Calendar() {
             start: formattedStart,
             end: formattedStart === formattedEnd ? moment(formattedEnd).add(1, 'day').format("YYYY-MM-DD") : formattedEnd,
             allDay: allDay,
-            color: color,
+            finish: finish,
+            color: colorCode,
             userId: user.uid
         });
 
         // Update event properties after updating backend
         eventEdit.setProp("title", title);
         eventEdit.setDates(formattedStart, formattedStart === formattedEnd ? moment(formattedEnd).add(1, 'day').format("YYYY-MM-DD") : formattedEnd, { allDay: allDay });
-        eventEdit.setProp("backgroundColor", color);
-        eventEdit.setProp("borderColor", color);
+        eventEdit.setProp("backgroundColor", colorCode);
+        eventEdit.setProp("borderColor", colorCode);
+        eventEdit.setExtendedProp("finish", finish);
 
         setIsEditOpen(false);
         setLoading(false);
@@ -251,8 +258,9 @@ export default function Calendar() {
             start: eventEdit.startStr,
             end: eventEdit.endStr,
             allDay: eventEdit.allDay,
+            finish: eventEdit.extendedProps.finish,
             color: eventEdit.borderColor,
-            userId: user.uid
+            userId: eventEdit.extendedProps.userId
         }).then(() => {
             eventEdit.setDates(eventEdit.startStr, eventEdit.endStr, { allDay: eventEdit.allDay });
         }).finally(() => {
