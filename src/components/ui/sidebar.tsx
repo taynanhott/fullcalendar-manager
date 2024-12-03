@@ -41,10 +41,10 @@ export default function Sidebar({ className }: Props) {
                   viewport={{ once: true }}
                 >
                   <Button variant="ghost" className="w-full flex justify-start">
-                    <a href="/calendar" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                    <Link href="/calendar" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
                       <CalendarDays className="h-5 w-5" />
                       <span>Calendar</span>
-                    </a>
+                    </Link>
                   </Button>
                 </motion.div>
                 <motion.div
@@ -54,10 +54,10 @@ export default function Sidebar({ className }: Props) {
                   viewport={{ once: true }}
                 >
                   <Button variant="ghost" className="w-full flex justify-start">
-                    <a href="/calendar/dashboard" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                    <Link href="/calendar/dashboard" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
                       <LayoutDashboard className="h-5 w-5" />
                       <span>Dashboard</span>
-                    </a>
+                    </Link>
                   </Button>
                 </motion.div>
                 <motion.div
@@ -67,10 +67,10 @@ export default function Sidebar({ className }: Props) {
                   viewport={{ once: true }}
                 >
                   <Button variant="ghost" className="w-full flex justify-start">
-                    <a href="https://financial.taynan.dev/" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                    <Link href="https://financial.taynan.dev/" target="_self" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
                       <Wallet className="h-5 w-5" />
                       <span>Financial Manager</span>
-                    </a>
+                    </Link>
                   </Button>
                 </motion.div>
               </div>
@@ -78,14 +78,14 @@ export default function Sidebar({ className }: Props) {
           </SheetContent>
         </Sheet>
         <Button variant="ghost" size="icon" aria-label="Home" className="w-[130px] hidden lg:block rounded-full hover:bg-transparent" onClick={() => { }}>
-          <a href="/calendar" target="_self" className="flex items-center mx-auto space-x-2 rounded">
+          <Link href="/calendar" target="_self" className="flex items-center mx-auto space-x-2 rounded">
             <Image src="/image/logo.png" width={130} height={40} alt="logo" />
-          </a>
+          </Link>
         </Button>
         <Button variant="ghost" size="icon" aria-label="Home" className="lg:hidden rounded-full w-[40px] h-[40px] hover:bg-transparent" onClick={() => { }}>
-          <a href="/calendar" target="_self" className="flex items-center space-x-2 rounded p-2">
+          <Link href="/calendar" target="_self" className="flex items-center space-x-2 rounded p-2">
             <Image src="/image/logo-ico.png" width={40} height={40} alt="logo" />
-          </a>
+          </Link>
         </Button>
         <Sheet open={openAccount} onOpenChange={setOpenAccount}>
           <SheetTrigger asChild>
@@ -112,10 +112,10 @@ export default function Sidebar({ className }: Props) {
                   viewport={{ once: true }}
                 >
                   <Button variant="ghost" className="w-full flex justify-start">
-                    <a href="https://www.linkedin.com/in/taynan-hott/" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                    <Link href="https://www.linkedin.com/in/taynan-hott/" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
                       <Linkedin className="h-5 w-5" />
                       <span>Linkedin</span>
-                    </a>
+                    </Link>
                   </Button>
                 </motion.div>
                 <motion.div
@@ -125,10 +125,10 @@ export default function Sidebar({ className }: Props) {
                   viewport={{ once: true }}
                 >
                   <Button variant="ghost" className="w-full flex justify-start">
-                    <a href="https://github.com/taynanhott" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
+                    <Link href="https://github.com/taynanhott" target="_blank" className="flex items-center space-x-2 hover:bg-gray-100 rounded p-2">
                       <Github className="h-5 w-5" />
                       <span>Repository</span>
-                    </a>
+                    </Link>
                   </Button>
                 </motion.div>
               </div>

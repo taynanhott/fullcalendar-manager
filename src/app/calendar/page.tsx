@@ -36,7 +36,7 @@ if (typeof window !== 'undefined') {
 
     small = width < 768;
 
-    const percent = small ? 0.84 : 0.82;
+    const percent = small ? 0.83 : 0.82;
 
     height = Math.round(screenHeight * percent);
 }
@@ -50,13 +50,14 @@ export default function Calendar() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [events, setEvents] = useState<EventInput[]>([]);
-    const [sheetSide, setSheetSide] = useState<SideOptions>('bottom');
+    const [sheetSide] = useState<SideOptions>('bottom');
     const [isDateSelectActive, setIsDateSelectActive] = useState(false);
     const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
     const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
     const [rangeEnd, setRangeEnd] = useState(moment().endOf('month').format("YYYY-MM-DD"));
     const [rangeStart, setRangeStart] = useState(moment().startOf('month').format("YYYY-MM-DD"));
-    const [toolbarConfig, setToolbarConfig] = useState({ left: 'prev,next', center: 'title', right: '' });
+    const monthsShort = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const [date, setDate] = useState<string>(`${monthsShort[moment().month()]}, ${moment().year() - 2000}`);
 
     useEffect(() => {
         const fetchEvents = async (rangeStart: string, rangeEnd: string) => {
@@ -76,14 +77,6 @@ export default function Calendar() {
     }, [user.uid, rangeStart, rangeEnd]);
 
     // Other functions =======================================================================
-    useEffect(() => {
-        setToolbarConfig({
-            left: small ? 'prev,next' : 'prev,next today',
-            center: 'title',
-            right: ''
-        });
-        setSheetSide(small ? 'bottom' : 'right');
-    }, []);
 
     const handleDateClick = (selectInfo: DateClickArg) => {
         if (!isDateSelectActive) {
@@ -244,7 +237,7 @@ export default function Calendar() {
         }
     };
 
-    const handleChangeView = (view: 'listWeek' | 'dayGridWeek' | 'dayGridMonth') => {
+    const handleChangeView = (view: 'listWeek' | 'dayGridWeek' | 'dayGridMonth' | 'timeGridWeek') => {
         if (calendarRef.current) {
             calendarRef.current.getApi().changeView(view);
         }
@@ -277,20 +270,55 @@ export default function Calendar() {
         return 'dayGridMonth';
     };
 
+    const nextRange = () => {
+        if (calendarRef.current) {
+            calendarRef.current.getApi().next();
+            const currentMonth = moment(calendarRef.current.getApi().getDate()).month();
+            setDate(`${monthsShort[currentMonth]}, ${moment(calendarRef.current.getApi().getDate()).year() - 2000}`);
+        }
+    };
+
+    const previousRange = () => {
+        if (calendarRef.current) {
+            calendarRef.current.getApi().prev();
+            const currentMonth = moment(calendarRef.current.getApi().getDate()).month();
+            setDate(`${monthsShort[currentMonth]}, ${moment(calendarRef.current.getApi().getDate()).year() - 2000}`);
+        }
+    };
     return (
         <div>
             <div className="px-4 py-2 mt-0 lg:mt-14">
+
                 {/* =================================== Calendar =============================================== */}
-                <NavButton handleChangeView={handleChangeView} />
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 1 }}
                     viewport={{ once: true }}
                 >
+                    <div className="flex flex-col items-center mb-2">
+                        <div className="block lg:flex items-center gap-2">
+                            <div className="flex w-10/12 mx-auto">
+                                <Button
+                                    onClick={previousRange}
+                                    className="bg-[#2c3e50] w-20 h-6 border border-transparent rounded p-[0.4em] px-[0.65em] text-center select-none align-middle text-[1em] font-normal leading-[1.5]"
+                                >
+                                    {"<<"}
+                                </Button>
+                                <p className="px-2 text-lg font-bold">{date}</p>
+                                <Button
+                                    onClick={nextRange}
+                                    className="bg-[#2c3e50] w-20 h-6 border border-transparent rounded p-[0.4em] px-[0.65em] text-center select-none align-middle text-[1em] font-normal leading-[1.5]"
+                                >
+                                    {">>"}
+                                </Button>
+                            </div>
+                            <NavButton handleChangeView={handleChangeView} />
+                        </div>
+                    </div>
                     <FullCalendar
                         ref={calendarRef}
-                        headerToolbar={toolbarConfig}
+                        headerToolbar={false}
                         height={height}
                         views={{
                             dayGridMonth: {

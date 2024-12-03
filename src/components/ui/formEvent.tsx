@@ -131,7 +131,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                                 onChange={(e) => setEndTime(e.target.value)}
                             />
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 justify-between col-span-1">
                             <Label htmlFor="all-day">Finished</Label>
                             <Switch
                                 id="finish"
@@ -141,7 +141,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                         </div>
                     </div>
                 ) : (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 w-1/2 justify-between">
                         <Label htmlFor="repeat-count">Select an color</Label>
                         <ColorSelector
                             value={color}
@@ -151,7 +151,7 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                 )}
 
                 {(!event && oneDay == 1) ? (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 w-1/2 justify-between">
                         <Label htmlFor="all-day">Recurring Event</Label>
                         <Switch
                             id="all-day"
