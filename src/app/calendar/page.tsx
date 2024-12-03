@@ -50,7 +50,7 @@ export default function Calendar() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [events, setEvents] = useState<EventInput[]>([]);
-    const [sheetSide] = useState<SideOptions>('bottom');
+    const [sheetSide, setSheetSide] = useState<SideOptions>('bottom');
     const [isDateSelectActive, setIsDateSelectActive] = useState(false);
     const [eventToManage, setEventToManage] = useState<EventApi | null>(null);
     const [selectedEventInfo, setSelectedEventInfo] = useState<DateSelectArg | null>(null);
@@ -58,6 +58,10 @@ export default function Calendar() {
     const [rangeStart, setRangeStart] = useState(moment().startOf('month').format("YYYY-MM-DD"));
     const monthsShort = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const [date, setDate] = useState<string>(`${monthsShort[moment().month()]}, ${moment().year() - 2000}`);
+
+    useEffect(() => {
+        setSheetSide(small ? 'bottom' : 'right');
+    }, []);
 
     useEffect(() => {
         const fetchEvents = async (rangeStart: string, rangeEnd: string) => {
@@ -77,7 +81,6 @@ export default function Calendar() {
     }, [user.uid, rangeStart, rangeEnd]);
 
     // Other functions =======================================================================
-
     const handleDateClick = (selectInfo: DateClickArg) => {
         if (!isDateSelectActive) {
             if (calendarRef.current) {
@@ -86,7 +89,7 @@ export default function Calendar() {
         }
     };
 
-    // Event add functions =======================================================================
+    // Event add functions ===================================================================
     const handleDateSelect = (selectInfo: DateSelectArg) => {
         setSelectedEventInfo(selectInfo);
         setIsSheetOpen(true);
@@ -126,7 +129,7 @@ export default function Calendar() {
             const daysDiff = moment(eventEnd).diff(moment(eventStart), 'days');
             const looping = allDay ? daysWeek.length === daysDiff ? 1 : daysDiff : daysDiff;
             const equal = daysWeek.length === daysDiff;
-            const colorCode = !allDay ? finish ? '#3ad737' : '#e63333' : color;
+            const colorCode = !allDay ? (finish ? '#3ad737' : '#e63333') : color;
 
             setLoading(true);
             if (looping === 1) {
@@ -138,7 +141,7 @@ export default function Calendar() {
                         ? moment(eventEnd).add(count, durationUnit).format('YYYY-MM-DD')
                         : moment(eventStart).add(count, durationUnit).format('YYYY-MM-DD') + end;
 
-                    const id = (await writeEventData(title, startDate, endDate, allDay, finish, color, user.uid)).key ?? '';
+                    const id = (await writeEventData(title, startDate, endDate, allDay, finish, colorCode, user.uid)).key ?? '';
 
                     calendarApi.addEvent({
                         id,
@@ -168,7 +171,7 @@ export default function Calendar() {
                     const dayOfWeek = moment(startDate).day();
 
                     if (daysWeek.length === 0 || daysWeek.includes(dayOfWeek)) {
-                        const id = (await writeEventData(title, startDate, endDate, allDay, finish, color, user.uid)).key ?? '';
+                        const id = (await writeEventData(title, startDate, endDate, allDay, finish, colorCode, user.uid)).key ?? '';
 
                         calendarApi.addEvent({
                             id,
@@ -193,7 +196,7 @@ export default function Calendar() {
     const handleEventEdit = (eventEdit: EventApi, title: string, start: string, end: string, allDay: boolean, finish: boolean, color: string) => {
         let formattedStart = allDay ? moment(eventEdit.startStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + start;
         let formattedEnd = allDay ? moment(eventEdit.endStr).format("YYYY-MM-DD") : moment(eventEdit.start).format("YYYY-MM-DD") + end;
-        const colorCode = !allDay ? finish ? '#3ad737' : '#e63333' : color;
+        const colorCode = !allDay ? (finish ? '#3ad737' : '#e63333') : color;
 
         if (moment(formattedStart).isAfter(moment(formattedEnd))) {
             [formattedStart, formattedEnd] = [formattedEnd, formattedStart];
@@ -206,7 +209,7 @@ export default function Calendar() {
             start: formattedStart,
             end: formattedStart === formattedEnd ? moment(formattedEnd).add(1, 'day').format("YYYY-MM-DD") : formattedEnd,
             allDay: allDay,
-            finish: finish,
+            finish: finish ?? false,
             color: colorCode,
             userId: user.uid
         });
@@ -222,7 +225,7 @@ export default function Calendar() {
         setLoading(false);
     };
 
-    // Event remove functions =======================================================================
+    // Event remove functions ==============================================================
     function handleEventClick(clickInfo: { event: EventApi }) {
         setEventToManage(clickInfo.event);
         setIsEditOpen(true);
@@ -251,7 +254,7 @@ export default function Calendar() {
             start: eventEdit.startStr,
             end: eventEdit.endStr,
             allDay: eventEdit.allDay,
-            finish: eventEdit.extendedProps.finish,
+            finish: eventEdit.extendedProps.finish ?? false,
             color: eventEdit.borderColor,
             userId: eventEdit.extendedProps.userId
         }).then(() => {

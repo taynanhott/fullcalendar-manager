@@ -103,12 +103,12 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                 </div>
 
                 <div className="flex items-center space-x-2">
-                    <Label htmlFor="all-day">Event during all-day</Label>
                     <Switch
                         id="all-day"
                         checked={isAllDay}
                         onCheckedChange={setIsAllDay}
                     />
+                    <Label htmlFor="all-day">Event during all-day</Label>
                 </div>
 
                 {!isAllDay ? (
@@ -131,17 +131,17 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                                 onChange={(e) => setEndTime(e.target.value)}
                             />
                         </div>
-                        <div className="flex items-center space-x-2 justify-between col-span-1">
-                            <Label htmlFor="all-day">Finished</Label>
+                        <div className="flex items-center space-x-2">
                             <Switch
                                 id="finish"
                                 checked={finish}
                                 onCheckedChange={setFinish}
                             />
+                            <Label htmlFor="all-day">Finished</Label>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex items-center space-x-2 w-1/2 justify-between">
+                    <div className="flex items-center space-x-2">
                         <Label htmlFor="repeat-count">Select an color</Label>
                         <ColorSelector
                             value={color}
@@ -151,13 +151,13 @@ export default function FormEvent({ handleEventCreate, handleEventEdit, selected
                 )}
 
                 {(!event && oneDay == 1) ? (
-                    <div className="flex items-center space-x-2 w-1/2 justify-between">
-                        <Label htmlFor="all-day">Recurring Event</Label>
+                    <div className="flex items-center space-x-2">
                         <Switch
                             id="all-day"
                             checked={useRepeat}
                             onCheckedChange={setUseRepeat}
                         />
+                        <Label htmlFor="all-day">Recurring Event</Label>
                     </div>) : !event &&
                 <WeekDaySelector daysWeek={daysWeek} setDaysWeek={setDaysWeek} className="col-span-2" selectedEventInfo={selectedEventInfo} />
                 }
