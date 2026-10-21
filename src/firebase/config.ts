@@ -1,6 +1,6 @@
 
-import { getAuth } from "firebase/auth";
-import { initializeApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
+import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import { getDatabase, ref, set, get, push, query, orderByChild, equalTo } from 'firebase/database';
 
 import moment from "moment";
@@ -15,8 +15,14 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+function getFirebaseApp(): FirebaseApp {
+  if (getApps().length > 0) return getApp();
+  return initializeApp(firebaseConfig);
+}
+
+function getFirebaseAuth(): Auth {
+  return getAuth(getFirebaseApp());
+}
 
 type Event = {
   id: string;
@@ -30,7 +36,7 @@ type Event = {
 };
 
 function writeEventData(title: string, start: string | Date, end: string | Date, allDay: boolean, finish: boolean = false, color: string, userId: string) {
-  const db = getDatabase();
+  const db = getDatabase(getFirebaseApp());
   const reference = ref(db, 'event/');
   const newReference = push(reference);
 
@@ -51,7 +57,7 @@ function writeEventData(title: string, start: string | Date, end: string | Date,
 }
 
 async function getEventsByUserId(userId: string, startDate: string, endDate: string): Promise<Event[]> {
-  const db = getDatabase();
+  const db = getDatabase(getFirebaseApp());
   const eventsRef = ref(db, "event");
 
   const userQuery = query(eventsRef, orderByChild("userId"), equalTo(userId));
@@ -79,7 +85,7 @@ async function getEventsByUserId(userId: string, startDate: string, endDate: str
 }
 
 async function updateEvent(eventId: string, updatedData: { id: string, title: string; start: string | Date; end: string | Date; allDay: boolean, finish: boolean; color: string; userId: string }): Promise<void> {
-  const db = getDatabase();
+  const db = getDatabase(getFirebaseApp());
   const eventRef = ref(db, `event/${eventId}`);
 
   try {
@@ -90,7 +96,7 @@ async function updateEvent(eventId: string, updatedData: { id: string, title: st
 }
 
 async function deleteEvent(eventId: string): Promise<void> {
-  const db = getDatabase();
+  const db = getDatabase(getFirebaseApp());
   const eventRef = ref(db, `event/${eventId}`);
 
   try {
@@ -100,4 +106,4 @@ async function deleteEvent(eventId: string): Promise<void> {
   }
 }
 
-export { auth, writeEventData, getEventsByUserId, deleteEvent, updateEvent };
+export { getFirebaseAuth, writeEventData, getEventsByUserId, deleteEvent, updateEvent };

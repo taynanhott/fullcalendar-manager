@@ -7,14 +7,25 @@ export const config = {
 
 const publicRoutes = ["/not-found", "/portal/sign-in"];
 
-export async function middleware(req: NextRequest) {
+async function hasValidSession(token: string | undefined) {
+    if (!token) return false;
+
+    try {
+        const { exp } = await AuthService.openSessionToken(token);
+        return typeof exp === "number" && exp * 1000 > Date.now();
+    } catch {
+        return false;
+    }
+}
+
+export async function proxy(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
 
     if (publicRoutes.includes(pathname)) {
         return NextResponse.next();
     }
 
-    const session = await AuthService.isSessionValid();
+    const session = await hasValidSession(req.cookies.get("session")?.value);
     if (!session) {
         const isAPIRoute = pathname.startsWith("/api");
 

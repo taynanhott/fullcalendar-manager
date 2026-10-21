@@ -2,7 +2,7 @@
 
 import { GoogleAuthProvider, signInWithPopup, UserCredential } from "firebase/auth";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/firebase/config";
+import { getFirebaseAuth } from "@/firebase/config";
 import { useUser } from "@/app/context/userContext";
 import { useState } from "react";
 
@@ -30,7 +30,7 @@ export default function LoginGoogleForm({ loginGoogle }: LoginGoogleFormProps) {
         const provider = new GoogleAuthProvider();
 
         try {
-            const result: UserCredential = await signInWithPopup(auth, provider);
+            const result: UserCredential = await signInWithPopup(getFirebaseAuth(), provider);
 
             if (result) {
                 console.log(result);

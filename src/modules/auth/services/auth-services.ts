@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as jose from "jose";
 import { cookies } from "next/headers";
 
@@ -19,36 +18,38 @@ async function createSessionToken(payload = {}) {
         .sign(secret);
     const { exp } = await openSessionToken(session);
 
-    (cookies() as any).set("session", session, {
-        expires: (exp as number) * 1000,
+    const cookieStore = await cookies();
+    cookieStore.set("session", session, {
+        expires: new Date((exp as number) * 1000),
         path: "/",
         httpOnly: true,
     });
 }
 
-
 export async function getSession() {
-    const session = (cookies() as any).get("session")?.value;
+    const cookieStore = await cookies();
+    const session = cookieStore.get("session")?.value;
     if (!session) return null;
     return await openSessionToken(session);
 }
 
 async function isSessionValid() {
-    const sessionCookie = (cookies() as any).get("session");
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session");
 
-    if (sessionCookie) {
-        const { value } = sessionCookie;
-        const { exp } = await openSessionToken(value);
-        const currentDate = new Date().getTime();
+    if (!sessionCookie) return false;
 
-        return (exp as number) * 1000 > currentDate;
+    try {
+        const { exp } = await openSessionToken(sessionCookie.value);
+        return (exp as number) * 1000 > Date.now();
+    } catch {
+        return false;
     }
-
-    return false;
 }
 
-function destroySession() {
-    (cookies() as any).delete("session");
+async function destroySession() {
+    const cookieStore = await cookies();
+    cookieStore.delete("session");
 }
 
 const AuthService = {
